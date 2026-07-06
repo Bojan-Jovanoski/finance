@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { Header } from '@/components/Header';
 import { Dashboard } from '@/components/Dashboard';
 import { MonthSetup } from '@/components/MonthSetup';
@@ -66,6 +67,7 @@ function AppContent({ uid }: { uid: string }) {
 export default function App() {
   const { user, signIn } = useAuth();
 
+
   if (user === undefined) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -81,6 +83,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       <AppContent uid={user.uid} />
+      <UpdatePrompt />
     </div>
   );
 }
