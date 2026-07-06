@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   collection, query, orderBy, where, onSnapshot,
-  addDoc, updateDoc, deleteDoc, doc, writeBatch, getDocs,
+  addDoc, updateDoc, deleteDoc, doc, writeBatch, getDocs, deleteField,
 } from 'firebase/firestore';
 import { firestore } from '@/db/firebase';
 import type { Category } from '@/db/types';
@@ -58,6 +58,12 @@ export function useCategories(uid: string) {
     await updateDoc(doc(firestore, 'users', uid, 'categories', id), { name: name.trim() });
   }
 
+  async function setCategoryLimit(id: string, limit: number | null) {
+    await updateDoc(doc(firestore, 'users', uid, 'categories', id), {
+      monthlyLimit: limit !== null ? limit : deleteField(),
+    });
+  }
+
   async function deleteCategory(id: string) {
     const other = categories.find((c) => c.name === 'Other');
     if (other?.id && other.id !== id) {
@@ -74,5 +80,5 @@ export function useCategories(uid: string) {
     return categories.find((c) => c.id === id);
   }
 
-  return { categories, addCategory, renameCategory, deleteCategory, getCategoryById };
+  return { categories, addCategory, renameCategory, deleteCategory, getCategoryById, setCategoryLimit };
 }

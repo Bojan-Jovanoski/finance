@@ -8,6 +8,7 @@ export interface Category {
   id?: string; // Firestore document ID
   name: string;
   isDefault: boolean;
+  monthlyLimit?: number;
 }
 
 export interface Expense {
