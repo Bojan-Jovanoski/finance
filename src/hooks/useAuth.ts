@@ -11,20 +11,29 @@ import { auth } from '@/db/firebase';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Pick up the result when Google redirects back to the app
-    getRedirectResult(auth).catch(() => {});
-    return onAuthStateChanged(auth, setUser);
+    getRedirectResult(auth).catch((err: Error) => {
+      setAuthError(err.message);
+    });
+    return onAuthStateChanged(auth, setUser, (err) => {
+      setAuthError(err.message);
+    });
   }, []);
 
   async function signIn() {
-    await signInWithRedirect(auth, new GoogleAuthProvider());
+    try {
+      setAuthError(null);
+      await signInWithRedirect(auth, new GoogleAuthProvider());
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Sign-in failed');
+    }
   }
 
   async function signOutUser() {
     await signOut(auth);
   }
 
-  return { user, signIn, signOut: signOutUser };
+  return { user, signIn, signOut: signOutUser, authError };
 }

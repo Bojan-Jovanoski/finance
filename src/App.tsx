@@ -65,7 +65,7 @@ function AppContent({ uid }: { uid: string }) {
 }
 
 export default function App() {
-  const { user, signIn } = useAuth();
+  const { user, signIn, authError } = useAuth();
 
 
   if (user === undefined) {
@@ -77,7 +77,7 @@ export default function App() {
   }
 
   if (user === null) {
-    return <LoginScreen onSignIn={signIn} />;
+    return <LoginScreen onSignIn={signIn} error={authError} />;
   }
 
   return (

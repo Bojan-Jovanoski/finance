@@ -1,6 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import {
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,10 +20,17 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 
-// Persistent local cache = full offline support: reads/writes work without internet,
-// then sync automatically when connection is restored.
-export const firestore = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-});
+// Use single-tab persistent cache — more compatible with iOS Safari.
+// Falls back to in-memory if IndexedDB is unavailable (e.g. private browsing).
+let firestoreInstance;
+try {
+  firestoreInstance = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentSingleTabManager({ forceOwnership: true }),
+    }),
+  });
+} catch {
+  firestoreInstance = getFirestore(app);
+}
+
+export const firestore = firestoreInstance;

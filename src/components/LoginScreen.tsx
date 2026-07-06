@@ -1,8 +1,9 @@
 interface LoginScreenProps {
   onSignIn: () => void;
+  error?: string | null;
 }
 
-export function LoginScreen({ onSignIn }: LoginScreenProps) {
+export function LoginScreen({ onSignIn, error }: LoginScreenProps) {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-10 w-full max-w-sm text-center">
@@ -15,6 +16,7 @@ export function LoginScreen({ onSignIn }: LoginScreenProps) {
         <p className="text-sm text-slate-500 mb-8">
           Track your income, expenses, and savings — synced across all your devices.
         </p>
+
         <button
           onClick={onSignIn}
           className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl transition-colors shadow-sm"
@@ -27,6 +29,13 @@ export function LoginScreen({ onSignIn }: LoginScreenProps) {
           </svg>
           Sign in with Google
         </button>
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-left">
+            <p className="text-xs font-medium text-red-700 mb-1">Sign-in error</p>
+            <p className="text-xs text-red-600 break-all">{error}</p>
+          </div>
+        )}
       </div>
     </div>
   );
