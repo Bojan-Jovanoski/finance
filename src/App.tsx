@@ -65,15 +65,12 @@ function AppContent({ uid }: { uid: string }) {
 }
 
 export default function App() {
-  const { user, signIn, authError, pendingRedirect } = useAuth();
+  const { user, signIn, authError } = useAuth();
 
-  if (user === undefined || pendingRedirect) {
+  if (user === undefined) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-3">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-        {pendingRedirect && (
-          <p className="text-sm text-slate-500">Completing sign-in…</p>
-        )}
       </div>
     );
   }
