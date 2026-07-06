@@ -11,11 +11,11 @@ const COLORS = [
 interface SpendingChartProps {
   expenses: Expense[];
   categories: Category[];
-  onSelectCategory: (id: number) => void;
+  onSelectCategory: (id: string) => void;
 }
 
 interface ChartEntry {
-  id: number;
+  id: string;
   name: string;
   value: number;
   color: string;
@@ -24,7 +24,7 @@ interface ChartEntry {
 export function SpendingChart({ expenses, categories, onSelectCategory }: SpendingChartProps) {
   const categoryMap = new Map(categories.map((c) => [c.id!, c]));
 
-  const grouped = expenses.reduce<Map<number, number>>((acc, exp) => {
+  const grouped = expenses.reduce<Map<string, number>>((acc, exp) => {
     acc.set(exp.categoryId, (acc.get(exp.categoryId) ?? 0) + exp.amount);
     return acc;
   }, new Map());

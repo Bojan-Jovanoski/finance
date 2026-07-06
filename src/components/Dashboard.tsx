@@ -6,20 +6,20 @@ import { useCategories } from '@/hooks/useCategories';
 import type { Budget } from '@/db/types';
 
 interface DashboardProps {
+  uid: string;
   month: string;
   budget: Budget;
-  onSelectCategory: (id: number) => void;
+  onSelectCategory: (id: string) => void;
 }
 
-export function Dashboard({ month, budget, onSelectCategory }: DashboardProps) {
-  const { expenses } = useExpenses(month);
-  const { categories } = useCategories();
-
+export function Dashboard({ uid, month, budget, onSelectCategory }: DashboardProps) {
+  const { expenses } = useExpenses(uid, month);
+  const { categories } = useCategories(uid);
   const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
 
   return (
     <div className="space-y-6">
-      <SummaryCards budget={budget} totalSpent={totalSpent} month={month} />
+      <SummaryCards uid={uid} budget={budget} totalSpent={totalSpent} month={month} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-5">
@@ -30,10 +30,9 @@ export function Dashboard({ month, budget, onSelectCategory }: DashboardProps) {
             onSelectCategory={onSelectCategory}
           />
         </div>
-
         <div className="bg-white rounded-2xl border border-slate-200 p-5">
           <h2 className="text-sm font-semibold text-slate-700 mb-4">Add expense</h2>
-          <QuickAddForm month={month} />
+          <QuickAddForm uid={uid} month={month} />
         </div>
       </div>
     </div>

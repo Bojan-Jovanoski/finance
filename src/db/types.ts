@@ -5,18 +5,18 @@ export interface Budget {
 }
 
 export interface Category {
-  id?: number;
+  id?: string; // Firestore document ID
   name: string;
   isDefault: boolean;
 }
 
 export interface Expense {
-  id?: number;
+  id?: string; // Firestore document ID
   amount: number;
-  categoryId: number;
+  categoryId: string;
   description: string;
   date: string; // "YYYY-MM-DD"
-  month: string; // "YYYY-MM" derived from date
+  month: string; // "YYYY-MM"
 }
 
 export interface ExportData {

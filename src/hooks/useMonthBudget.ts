@@ -1,24 +1,21 @@
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/db/database';
+import { useState, useEffect } from 'react';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { firestore } from '@/db/firebase';
 import type { Budget } from '@/db/types';
 
-export function useMonthBudget(month: string) {
-  // Returns undefined while loading, null if not found, Budget if found
-  const result = useLiveQuery(
-    async () => {
-      const budget = await db.budgets.get(month);
-      return budget ?? null;
-    },
-    [month],
-  );
+export function useMonthBudget(uid: string, month: string) {
+  const [budget, setBudget] = useState<Budget | null | undefined>(undefined);
+
+  useEffect(() => {
+    const ref = doc(firestore, 'users', uid, 'budgets', month);
+    return onSnapshot(ref, (snap) => {
+      setBudget(snap.exists() ? ({ id: snap.id, ...snap.data() } as Budget) : null);
+    });
+  }, [uid, month]);
 
   async function saveBudget(income: number, savingsGoal: number) {
-    await db.budgets.put({ id: month, income, savingsGoal });
+    await setDoc(doc(firestore, 'users', uid, 'budgets', month), { income, savingsGoal });
   }
 
-  return {
-    budget: result as Budget | null | undefined,
-    isLoading: result === undefined,
-    saveBudget,
-  };
+  return { budget, saveBudget };
 }
