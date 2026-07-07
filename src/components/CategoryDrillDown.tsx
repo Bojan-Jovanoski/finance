@@ -171,7 +171,7 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
                       <td colSpan={2} className="pt-3 font-mono text-[11px] uppercase tracking-wider text-ink-soft">
                         {categoryExpenses.length} entr{categoryExpenses.length !== 1 ? 'ies' : 'y'}
                       </td>
-                      <td className="pt-3 text-right font-mono font-semibold text-ink whitespace-nowrap">{formatMKD(total)}</td>
+                      <td className="pt-3 pr-4 text-right font-mono font-semibold text-ink whitespace-nowrap">{formatMKD(total)}</td>
                       <td />
                     </tr>
                   </tfoot>
