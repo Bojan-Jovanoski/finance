@@ -122,16 +122,16 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-rule-bold">
-                      <th className="text-left py-2 pr-4 eyebrow font-normal cursor-pointer hover:text-ink select-none whitespace-nowrap" onClick={() => toggleSort('date')}>
+                      <th className="text-left py-2 pr-4 font-mono uppercase text-[10px] tracking-wider font-normal text-ink-soft cursor-pointer hover:text-ink select-none whitespace-nowrap" onClick={() => toggleSort('date')}>
                         Date <SortIcon field="date" />
                       </th>
-                      <th className="text-left py-2 pr-4 eyebrow font-normal cursor-pointer hover:text-ink select-none w-full" onClick={() => toggleSort('description')}>
+                      <th className="text-left py-2 pr-4 font-mono uppercase text-[10px] tracking-wider font-normal text-ink-soft cursor-pointer hover:text-ink select-none whitespace-nowrap w-full" onClick={() => toggleSort('description')}>
                         Description <SortIcon field="description" />
                       </th>
-                      <th className="text-right py-2 pr-4 eyebrow font-normal cursor-pointer hover:text-ink select-none whitespace-nowrap" onClick={() => toggleSort('amount')}>
+                      <th className="text-right py-2 pr-4 font-mono uppercase text-[10px] tracking-wider font-normal text-ink-soft cursor-pointer hover:text-ink select-none whitespace-nowrap" onClick={() => toggleSort('amount')}>
                         Amount <SortIcon field="amount" />
                       </th>
-                      <th className="py-2 w-16" />
+                      <th className="py-2 w-10" />
                     </tr>
                   </thead>
                   <tbody>
