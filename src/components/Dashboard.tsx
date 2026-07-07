@@ -17,22 +17,18 @@ export function Dashboard({ month, budget, onSelectCategory }: DashboardProps) {
   const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       <SummaryCards budget={budget} totalSpent={totalSpent} month={month} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-100 p-5">
-          <h2 className="text-sm font-semibold text-slate-800 mb-4">Spending by category</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+        <div className="bg-white border border-rule rounded-lg p-5">
           <SpendingChart
             expenses={expenses}
             categories={categories}
             onSelectCategory={onSelectCategory}
           />
         </div>
-        <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-100 p-5">
-          <h2 className="text-sm font-semibold text-slate-800 mb-4">Add expense</h2>
-          <QuickAddForm month={month} />
-        </div>
+        <QuickAddForm month={month} />
       </div>
     </div>
   );

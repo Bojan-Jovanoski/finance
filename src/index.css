@@ -9,7 +9,27 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-paper text-ink;
+    /* Money is columnar data — keep digits a fixed width so amounts line up. */
+    font-variant-numeric: tabular-nums;
+    /* Clear the iOS home indicator when installed as a PWA. */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Uppercase mono eyebrow/label used across the statement UI. */
+  .eyebrow {
+    @apply font-mono uppercase text-ink-soft;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+  }
+
+  /* Visible keyboard focus for controls that otherwise only style :hover.
+     Inputs/selects keep their own focus ring, so they're excluded here. */
+  button:focus-visible,
+  a:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #23261d;
+    outline-offset: 2px;
   }
 
   /* iOS Safari renders type=date with a grey fill, centered value and its own
@@ -31,5 +51,22 @@
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+  }
+
+  /* Extends a sticky top bar's background up behind the status bar / notch. */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Honour the OS "reduce motion" setting — spinners and transitions go still. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

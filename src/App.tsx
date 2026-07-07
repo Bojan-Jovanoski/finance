@@ -5,6 +5,7 @@ import { useHousehold } from '@/hooks/useHousehold';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { Header } from '@/components/Header';
 import { Dashboard } from '@/components/Dashboard';
+import { Analysis } from '@/components/Analysis';
 import { MonthSetup } from '@/components/MonthSetup';
 import { CategoryDrillDown } from '@/components/CategoryDrillDown';
 import { CategoryManager } from '@/components/CategoryManager';
@@ -18,9 +19,24 @@ import { currentMonth } from '@/utils/format';
 
 function Spinner() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen bg-paper flex items-center justify-center">
+      <div className="w-6 h-6 border-2 border-ink border-t-transparent rounded-full animate-spin" />
     </div>
+  );
+}
+
+function TabButton({ active, onClick, children }: {
+  active: boolean; onClick: () => void; children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors ${
+        active ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -42,6 +58,7 @@ function AppContent({
   const [showDataPortability, setShowDataPortability] = useState(false);
   const [showHousehold, setShowHousehold] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [view, setView] = useState<'overview' | 'analysis'>('overview');
 
   return (
     <>
@@ -58,16 +75,26 @@ function AppContent({
       <main className="max-w-6xl mx-auto px-4 py-6">
         {budget === undefined ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-ink border-t-transparent rounded-full animate-spin" />
           </div>
         ) : budget === null ? (
           <MonthSetup month={month} />
         ) : (
-          <Dashboard
-            month={month}
-            budget={budget}
-            onSelectCategory={setSelectedCategoryId}
-          />
+          <div className="space-y-6">
+            <div className="flex border border-rule-bold rounded-md overflow-hidden w-full max-w-xs mx-auto">
+              <TabButton active={view === 'overview'} onClick={() => setView('overview')}>Overview</TabButton>
+              <TabButton active={view === 'analysis'} onClick={() => setView('analysis')}>Analysis</TabButton>
+            </div>
+            {view === 'overview' ? (
+              <Dashboard
+                month={month}
+                budget={budget}
+                onSelectCategory={setSelectedCategoryId}
+              />
+            ) : (
+              <Analysis month={month} budget={budget} />
+            )}
+          </div>
         )}
       </main>
 
@@ -114,7 +141,7 @@ function HouseholdGate({ user, onSignOut }: { user: User; onSignOut: () => void 
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-paper font-sans">
       <AppContent
         user={user}
         members={household?.members ?? []}

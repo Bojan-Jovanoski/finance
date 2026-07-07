@@ -31,8 +31,15 @@ export function Header({
         setMenuOpen(false);
       }
     }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setMenuOpen(false);
+    }
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, [menuOpen]);
 
   function runAndClose(fn: () => void) {
@@ -41,21 +48,19 @@ export function Header({
   }
 
   return (
-    <header className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+    <header className="bg-paper/95 backdrop-blur border-b-2 border-ink sticky top-0 z-40 safe-top">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center gap-2">
         <div className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center shadow-sm">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="w-8 h-8 rounded-full border-[1.5px] border-ink flex items-center justify-center font-mono font-semibold text-ink">
+            $
           </div>
-          <span className="font-bold text-slate-900 text-sm hidden sm:block tracking-tight">Finance</span>
+          <span className="font-semibold text-ink text-sm hidden sm:block tracking-tight">Finance</span>
         </div>
 
         <div className="flex items-center gap-0.5 mx-auto">
           <button
             onClick={() => onMonthChange(prevMonth(month))}
-            className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md text-ink-soft hover:text-ink hover:bg-ledgerbar transition-colors"
             aria-label="Previous month"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,17 +69,15 @@ export function Header({
           </button>
           <button
             onClick={() => onMonthChange(currentMonth())}
-            className={`px-2 h-8 text-sm font-semibold rounded-xl transition-colors w-[124px] text-center ${
-              isCurrentMonth
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-slate-700 hover:bg-slate-100'
+            className={`px-2 h-8 font-mono text-sm font-medium rounded-md transition-colors w-[128px] text-center ${
+              isCurrentMonth ? 'text-ink' : 'text-ink-soft hover:text-ink hover:bg-ledgerbar'
             }`}
           >
             {formatMonthLabel(month)}
           </button>
           <button
             onClick={() => onMonthChange(nextMonth(month))}
-            className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md text-ink-soft hover:text-ink hover:bg-ledgerbar transition-colors"
             aria-label="Next month"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,10 +89,11 @@ export function Header({
         <div className="relative shrink-0" ref={menuRef}>
           <button
             onClick={() => setMenuOpen((o) => !o)}
-            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors ${
-              menuOpen ? 'text-slate-800 bg-slate-100' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:bg-slate-200'
+            className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors ${
+              menuOpen ? 'text-ink bg-ledgerbar' : 'text-ink-soft hover:text-ink hover:bg-ledgerbar'
             }`}
             aria-label="Menu"
+            aria-haspopup="menu"
             aria-expanded={menuOpen}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +102,7 @@ export function Header({
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-1.5 w-52 bg-white rounded-2xl shadow-lg border border-slate-100 py-1.5 z-50">
+            <div role="menu" className="absolute right-0 mt-1.5 w-52 bg-white rounded-lg shadow-lg border border-rule py-1.5 z-50">
               <MenuItem label="Recently added" onClick={() => runAndClose(onOpenHistory)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </MenuItem>
@@ -112,7 +116,7 @@ export function Header({
               <MenuItem label="Backup & restore" onClick={() => runAndClose(onOpenDataPortability)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </MenuItem>
-              <div className="my-1 border-t border-slate-100" />
+              <div className="my-1 border-t border-rule" />
               <MenuItem label="Sign out" onClick={() => runAndClose(onSignOut)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </MenuItem>
@@ -131,10 +135,11 @@ function MenuItem({ label, onClick, children }: {
 }) {
   return (
     <button
+      role="menuitem"
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-ledgerbar active:bg-rule transition-colors"
     >
-      <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4 text-ink-soft shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         {children}
       </svg>
       {label}

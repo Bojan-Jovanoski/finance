@@ -118,10 +118,10 @@ export function DataPortability({ onClose }: DataPortabilityProps) {
       <Modal title="Backup & Restore" onClose={onClose} maxWidth="max-w-sm">
         <div className="p-6 space-y-6">
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Export</h3>
-            <p className="text-xs text-slate-500">Download all your data as a JSON file.</p>
+            <h3 className="text-xs font-semibold text-ink uppercase tracking-wide">Export</h3>
+            <p className="text-xs text-ink-soft">Download all your data as a JSON file.</p>
             <button onClick={handleExport}
-              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
+              className="w-full py-2.5 bg-ink hover:bg-ink text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -129,24 +129,24 @@ export function DataPortability({ onClose }: DataPortabilityProps) {
             </button>
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-rule" />
 
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Restore</h3>
-            <p className="text-xs text-slate-500">
-              Restore from a backup file. <strong className="text-slate-700">Replaces all current data.</strong>
+            <h3 className="text-xs font-semibold text-ink uppercase tracking-wide">Restore</h3>
+            <p className="text-xs text-ink-soft">
+              Restore from a backup file. <strong className="text-ink">Replaces all current data.</strong>
             </p>
             <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={handleFileChange} className="hidden" />
             <button onClick={() => fileInputRef.current?.click()}
-              className={`w-full py-2.5 text-sm font-medium rounded-xl border-2 border-dashed transition-colors flex items-center justify-center gap-2 ${
-                importSuccess ? 'border-emerald-400 text-emerald-600 bg-emerald-50' : 'border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50'
+              className={`w-full py-2.5 text-sm font-medium rounded-lg border-2 border-dashed transition-colors flex items-center justify-center gap-2 ${
+                importSuccess ? 'border-credit text-credit bg-ledgerbar' : 'border-rule text-ink-soft hover:border-rule-bold hover:text-ink hover:bg-ledgerbar'
               }`}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               {importSuccess ? 'Restored successfully' : 'Choose backup file'}
             </button>
-            {importError && <p className="text-xs text-red-500">{importError}</p>}
+            {importError && <p className="text-xs text-debit">{importError}</p>}
           </div>
         </div>
       </Modal>

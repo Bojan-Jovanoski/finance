@@ -42,100 +42,61 @@ export function SummaryCards({ budget, totalSpent, month }: SummaryCardsProps) {
 
   return (
     <>
-      <div className="space-y-3">
-        {isOverBudget && (
-          <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl px-4 py-3">
-            <div className="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <p className="text-sm text-red-700">
-              Over budget by <strong>{formatMKD(Math.abs(remaining))}</strong>
-            </p>
-          </div>
-        )}
+      <section>
+        <div className="eyebrow mb-3">Statement summary</div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <StatCard
-            label="Income"
-            value={formatMKD(budget.income)}
-            accent="slate"
-            editing={editing}
-            editContent={
-              <input
-                type="number" min="0" step="1" value={income}
-                onChange={(e) => setIncome(e.target.value)}
-                className="w-full text-lg font-bold bg-transparent border-b-2 border-indigo-400 focus:outline-none focus:border-indigo-600 pb-0.5"
-              />
-            }
-          />
-          <StatCard
-            label="Savings goal"
-            value={formatMKD(budget.savingsGoal)}
-            accent="indigo"
-            editing={editing}
-            editContent={
-              <input
-                type="number" min="0" step="1" value={savingsGoal}
-                onChange={(e) => setSavingsGoal(e.target.value)}
-                className="w-full text-lg font-bold bg-transparent border-b-2 border-indigo-400 focus:outline-none focus:border-indigo-600 pb-0.5"
-              />
-            }
-          />
-
-          <div className={`bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] border p-4 col-span-2 ${isOverBudget ? 'border-red-100' : 'border-slate-100'}`}>
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <p className="text-xs text-slate-500 mb-1">Spent this month</p>
-                <p className={`text-lg font-bold ${isOverBudget ? 'text-red-600' : 'text-slate-900'}`}>
-                  {formatMKD(totalSpent)}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-slate-500 mb-1">{isOverBudget ? 'Over budget' : 'Remaining'}</p>
-                <p className={`text-lg font-bold ${isOverBudget ? 'text-red-600' : remaining < spendable * 0.2 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                  {formatMKD(Math.abs(remaining))}
-                </p>
-              </div>
-            </div>
-            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  isOverBudget ? 'bg-red-500' : spentPct > 80 ? 'bg-amber-400' : 'bg-indigo-500'
-                }`}
-                style={{ width: `${spentPct}%` }}
-              />
-            </div>
-            <p className="text-xs text-slate-400 mt-1.5">{spentPct}% of {formatMKD(spendable)} budget used</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 px-1">
-          {editing ? (
-            <form onSubmit={handleSave} className="flex items-center gap-2">
-              <button type="submit" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
-                Save changes
+        {editing ? (
+          <form onSubmit={handleSave} className="space-y-3">
+            <EditLine label="Income" value={income} onChange={setIncome} />
+            <EditLine label="Savings goal" value={savingsGoal} onChange={setSavingsGoal} />
+            {error && <p className="text-xs text-debit">{error}</p>}
+            <div className="flex items-center gap-3 pt-1">
+              <button type="submit" className="font-mono text-xs uppercase tracking-wider bg-ink text-paper px-3 py-1.5 rounded-md hover:bg-black transition-colors">
+                Save
               </button>
-              <span className="text-slate-300">·</span>
-              <button type="button" onClick={handleCancelEdit} className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+              <button type="button" onClick={handleCancelEdit} className="text-xs text-ink-soft hover:text-ink transition-colors">
                 Cancel
               </button>
-              {error && <span className="text-xs text-red-500 ml-1">{error}</span>}
-            </form>
-          ) : (
+            </div>
+          </form>
+        ) : (
+          <>
+            <Line label="Income" value={formatMKD(budget.income)} />
+            <Line label="Savings goal" value={`−${formatMKD(budget.savingsGoal)}`} muted />
+            <Line label="Spendable" value={formatMKD(spendable)} rule />
+            <Line label="Spent this month" value={`−${formatMKD(totalSpent)}`} muted />
+            <Line
+              label="Remaining"
+              value={`${isOverBudget ? '−' : ''}${formatMKD(Math.abs(remaining))}`}
+              grand
+              tone={isOverBudget ? 'debit' : 'credit'}
+            />
+
+            <div className="mt-4">
+              <div className="h-1.5 bg-ledgerbar border border-rule rounded-sm overflow-hidden">
+                <div
+                  className={`h-full ${isOverBudget ? 'bg-debit' : 'bg-ink'}`}
+                  style={{ width: `${isOverBudget ? 100 : spentPct}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-1.5">
+                <span className="font-mono text-[11px] text-ink-soft">{spentPct}% of budget used</span>
+                <span className="font-mono text-[11px] text-ink-soft">{formatMKD(spendable)}</span>
+              </div>
+            </div>
+
             <button
               onClick={() => { setIncome(String(budget.income)); setSavingsGoal(String(budget.savingsGoal)); setEditing(true); }}
-              className="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1"
+              className="mt-3 text-xs text-ink-soft hover:text-ink transition-colors inline-flex items-center gap-1"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
               Edit budget
             </button>
-          )}
-        </div>
-      </div>
+          </>
+        )}
+      </section>
 
       {confirmDiscard && (
         <ConfirmDialog
@@ -149,29 +110,37 @@ export function SummaryCards({ budget, totalSpent, month }: SummaryCardsProps) {
   );
 }
 
-type CardAccent = 'slate' | 'indigo';
-
-function StatCard({ label, value, accent, editing, editContent }: {
-  label: string; value: string; accent: CardAccent;
-  editing?: boolean; editContent?: React.ReactNode;
+function Line({ label, value, muted, rule, grand, tone }: {
+  label: string;
+  value: string;
+  muted?: boolean;
+  rule?: boolean;
+  grand?: boolean;
+  tone?: 'debit' | 'credit';
 }) {
-  const valueColor: Record<CardAccent, string> = {
-    slate: 'text-slate-900',
-    indigo: 'text-indigo-700',
-  };
-  const dotColor: Record<CardAccent, string> = {
-    slate: 'bg-slate-300',
-    indigo: 'bg-indigo-400',
-  };
+  const toneClass = tone === 'debit' ? 'text-debit' : tone === 'credit' ? 'text-credit' : 'text-ink';
   return (
-    <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-100 p-4">
-      <div className="flex items-center gap-1.5 mb-2">
-        <span className={`w-1.5 h-1.5 rounded-full ${dotColor[accent]}`} />
-        <p className="text-xs text-slate-500">{label}</p>
-      </div>
-      {editing && editContent ? editContent : (
-        <p className={`text-lg font-bold ${valueColor[accent]}`}>{value}</p>
-      )}
+    <div
+      className={`flex items-baseline py-1.5 ${rule ? 'border-t border-rule-bold mt-1 pt-2.5' : ''} ${grand ? 'border-t-2 border-double border-ink mt-1 pt-3' : ''}`}
+    >
+      <span className={`text-sm ${muted ? 'text-ink-soft' : grand ? 'text-ink font-medium' : 'text-ink'}`}>{label}</span>
+      <span className="flex-1 mx-2 border-b border-dotted border-rule-bold translate-y-[-3px]" />
+      <span className={`font-mono tabular-nums whitespace-nowrap ${grand ? `text-xl font-semibold ${toneClass}` : muted ? 'text-ink-soft' : 'text-ink'}`}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function EditLine({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex items-baseline py-1.5">
+      <label className="text-sm text-ink">{label}</label>
+      <span className="flex-1 mx-2 border-b border-dotted border-rule-bold translate-y-[-3px]" />
+      <input
+        type="number" min="0" step="1" value={value} onChange={(e) => onChange(e.target.value)}
+        className="w-32 text-right font-mono tabular-nums text-ink bg-transparent border-b border-ink focus:outline-none focus:border-b-2 pb-0.5"
+      />
     </div>
   );
 }

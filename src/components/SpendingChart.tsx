@@ -7,9 +7,9 @@ import type { Category, Expense } from '@/db/types';
 import { formatMKD } from '@/utils/format';
 
 const COLORS = [
-  '#6366f1', '#f59e0b', '#10b981', '#3b82f6', '#ef4444',
-  '#8b5cf6', '#06b6d4', '#f97316', '#ec4899', '#84cc16',
-  '#64748b', '#a16207', '#0f766e',
+  '#c8622e', '#b23b34', '#3f8f63', '#3aa0a6', '#5b6bd6',
+  '#4f8ad6', '#cf4d92', '#8bbf3f', '#7d5bd6', '#d69a2e',
+  '#6a7052', '#a16207', '#0f766e',
 ];
 
 interface SpendingChartProps {
@@ -51,11 +51,8 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 gap-2">
-        <svg className="w-8 h-8 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        <p className="text-sm text-slate-400">No expenses yet</p>
+      <div className="flex flex-col items-center justify-center h-40 gap-2">
+        <p className="text-sm text-ink-soft">No expenses yet this month.</p>
       </div>
     );
   }
@@ -65,18 +62,14 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-500">
-          Total <span className="font-semibold text-slate-700">{formatMKD(total)}</span>
-        </p>
-        <div className="flex bg-slate-100 rounded-xl p-1">
+        <span className="eyebrow">Spending by category</span>
+        <div className="inline-flex border border-rule-bold rounded-md overflow-hidden">
           {(['pie', 'bar'] as ChartType[]).map((type) => (
             <button
               key={type}
               onClick={() => setChartType(type)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-lg capitalize transition-all ${
-                chartType === type
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+              className={`px-3.5 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+                chartType === type ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'
               }`}
             >
               {type}
@@ -106,37 +99,36 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
             <Tooltip
               formatter={(value: number) => [formatMKD(value), 'Amount']}
               contentStyle={{
-                borderRadius: '12px',
-                border: 'none',
-                boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.15)',
+                borderRadius: '6px',
+                border: '1px solid #B4B2A6',
+                background: '#F7F6F2',
+                boxShadow: 'none',
                 fontSize: '12px',
-                padding: '8px 12px',
+                fontFamily: 'IBM Plex Mono, monospace',
+                padding: '6px 10px',
+                color: '#23261D',
               }}
             />
           </PieChart>
         </ResponsiveContainer>
       ) : (
         <ResponsiveContainer width="100%" height={barHeight}>
-          <BarChart
-            data={data}
-            layout="vertical"
-            margin={{ top: 0, right: 76, left: 0, bottom: 0 }}
-          >
+          <BarChart data={data} layout="vertical" margin={{ top: 0, right: 76, left: 0, bottom: 0 }}>
             <XAxis type="number" hide />
             <YAxis
               type="category"
               dataKey="name"
               width={92}
-              tick={{ fontSize: 11, fill: '#64748b' }}
+              tick={{ fontSize: 11, fill: '#6A6F60' }}
               axisLine={false}
               tickLine={false}
             />
             <Bar
               dataKey="value"
-              radius={[0, 5, 5, 0]}
+              radius={[0, 2, 2, 0]}
               onClick={(entry: ChartEntry) => onSelectCategory(entry.id)}
               style={{ cursor: 'pointer' }}
-              barSize={20}
+              barSize={18}
             >
               {data.map((entry) => (
                 <Cell key={entry.id} fill={entry.color} />
@@ -145,14 +137,14 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
                 dataKey="value"
                 position="right"
                 formatter={(v: number) => formatMKD(v)}
-                style={{ fontSize: 10, fill: '#94a3b8' }}
+                style={{ fontSize: 10, fill: '#6A6F60', fontFamily: 'IBM Plex Mono, monospace' }}
               />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       )}
 
-      <div className="space-y-0.5">
+      <div className="border-t border-ink">
         {data.map((entry) => {
           const limitPct = entry.limit ? Math.round((entry.value / entry.limit) * 100) : null;
           const overLimit = limitPct !== null && limitPct > 100;
@@ -162,51 +154,41 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
             <button
               key={entry.id}
               onClick={() => onSelectCategory(entry.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl active:bg-slate-100 transition-colors group text-left ${
-                overLimit ? 'hover:bg-red-50' : 'hover:bg-slate-50'
-              }`}
+              className="w-full flex items-center gap-3 px-2 py-2.5 text-left border-b border-rule hover:bg-ledgerbar transition-colors group"
             >
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: entry.color }}
-              />
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-600 truncate">{entry.name}</p>
+                <p className="text-sm text-ink truncate">{entry.name}</p>
                 {entry.limit && (
                   <div className="mt-1 flex items-center gap-1.5">
-                    <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden max-w-[80px]">
+                    <div className="flex-1 h-1 bg-ledgerbar rounded-full overflow-hidden max-w-[80px]">
                       <div
-                        className={`h-full rounded-full ${overLimit ? 'bg-red-500' : nearLimit ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                        className={`h-full ${overLimit ? 'bg-debit' : nearLimit ? 'bg-amber-500' : 'bg-credit'}`}
                         style={{ width: `${Math.min(100, limitPct!)}%` }}
                       />
                     </div>
-                    <span className={`text-xs tabular-nums ${overLimit ? 'text-red-500' : nearLimit ? 'text-amber-500' : 'text-slate-400'}`}>
+                    <span className={`font-mono text-[11px] ${overLimit ? 'text-debit' : nearLimit ? 'text-amber-600' : 'text-ink-soft'}`}>
                       {limitPct}% of {formatMKD(entry.limit)}
                     </span>
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {!entry.limit && (
-                  <span className="text-xs text-slate-400 tabular-nums">
-                    {Math.round((entry.value / total) * 100)}%
-                  </span>
-                )}
-                <span className={`text-sm font-semibold tabular-nums ${overLimit ? 'text-red-600' : 'text-slate-800'}`}>
-                  {formatMKD(entry.value)}
-                </span>
-                <svg
-                  className="w-3.5 h-3.5 text-slate-200 group-hover:text-indigo-400 transition-colors"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+              <span className="font-mono text-[11px] text-ink-soft w-10 text-right">
+                {Math.round((entry.value / total) * 100)}%
+              </span>
+              <span className={`font-mono text-sm font-medium w-24 text-right ${overLimit ? 'text-debit' : 'text-ink'}`}>
+                {formatMKD(entry.value)}
+              </span>
+              <svg className="w-3.5 h-3.5 text-rule-bold group-hover:text-ink transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           );
         })}
+        <div className="flex items-center px-2 pt-3 border-t-2 border-double border-ink">
+          <span className="text-sm font-medium text-ink flex-1">Total debits</span>
+          <span className="font-mono text-sm font-semibold text-ink">{formatMKD(total)}</span>
+        </div>
       </div>
     </div>
   );

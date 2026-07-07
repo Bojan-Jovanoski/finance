@@ -7,6 +7,9 @@ interface QuickAddFormProps {
   month: string;
 }
 
+const fieldLabel = 'block font-mono text-[10px] uppercase tracking-[0.14em] text-ink-soft mb-1.5';
+const underline = 'w-full bg-transparent border-0 border-b border-rule-bold px-0.5 py-1.5 text-ink focus:outline-none focus:border-ink transition-colors';
+
 export function QuickAddForm({ month }: QuickAddFormProps) {
   const { categories } = useCategories();
   const { addExpense } = useExpenses(month);
@@ -32,42 +35,54 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="relative border-[1.5px] border-ink bg-white p-5 pt-6">
+      <span className="absolute -top-2 left-4 bg-white px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft">
+        New entry
+      </span>
+
+      <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Amount</label>
+          <label className={fieldLabel}>Amount</label>
           <div className="relative">
-            <input type="number" min="1" step="1" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0"
-              className="w-full px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">ден</span>
+            <input
+              type="number" min="1" step="1" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0"
+              className={`${underline} font-mono text-2xl font-semibold pr-8`}
+            />
+            <span className="absolute right-0 bottom-2 font-mono text-[11px] text-ink-soft pointer-events-none">ДЕН</span>
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
+          <label className={fieldLabel}>Date</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-sm`} />
         </div>
       </div>
-      <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Category</label>
-        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white">
+
+      <div className="mt-4">
+        <label className={fieldLabel}>Category</label>
+        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className={`${underline} text-sm`}>
           <option value="">Select category…</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>
-      <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">
-          Description <span className="text-slate-400 font-normal">(optional)</span>
-        </label>
-        <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
+
+      <div className="mt-4">
+        <label className={fieldLabel}>Memo <span className="normal-case tracking-normal text-ink-soft">(optional)</span></label>
+        <input
+          type="text" value={description} onChange={(e) => setDescription(e.target.value)}
           placeholder="e.g. Lidl groceries" maxLength={200}
-          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
+          className={`${underline} text-sm`}
+        />
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
-      <button type="submit"
-        className={`w-full py-2 text-sm font-medium rounded-lg transition-colors ${success ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
-        {success ? '✓ Added' : 'Add expense'}
+
+      {error && <p className="text-xs text-debit mt-3">{error}</p>}
+
+      <button
+        type="submit"
+        className={`mt-5 w-full py-3 font-mono text-xs uppercase tracking-[0.1em] transition-colors ${
+          success ? 'bg-credit text-white' : 'bg-ink text-paper hover:bg-black'
+        }`}
+      >
+        {success ? '✓ Recorded' : 'Record expense'}
       </button>
     </form>
   );

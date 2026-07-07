@@ -45,23 +45,23 @@ export function HouseholdModal({ uid, members, onAddMember, onClose }: Household
     <Modal title="Household" onClose={onClose} maxWidth="max-w-sm">
       <div className="p-6 space-y-6">
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Members</h3>
+          <h3 className="text-xs font-semibold text-ink uppercase tracking-wide">Members</h3>
           <ul className="space-y-1">
             {members.map((m) => (
-              <li key={m} className="flex items-center gap-2 text-sm text-slate-700">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <li key={m} className="flex items-center gap-2 text-sm text-ink">
+                <span className="w-1.5 h-1.5 rounded-full bg-ink-soft" />
                 <code className="text-xs break-all">{m}</code>
-                {m === uid && <span className="text-xs text-slate-400">(you)</span>}
+                {m === uid && <span className="text-xs text-ink-soft">(you)</span>}
               </li>
             ))}
           </ul>
         </div>
 
-        <hr className="border-slate-100" />
+        <hr className="border-rule" />
 
         <form onSubmit={handleAdd} className="space-y-2">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Add your partner</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-xs font-semibold text-ink uppercase tracking-wide">Add your partner</h3>
+          <p className="text-xs text-ink-soft">
             Ask your partner to sign in, copy the link code shown on their screen, and paste it here.
           </p>
           <input
@@ -69,31 +69,31 @@ export function HouseholdModal({ uid, members, onAddMember, onClose }: Household
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="Paste link code…"
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="w-full px-3 py-2 text-sm border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition"
           />
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-debit">{error}</p>}
           <button
             type="submit"
             disabled={busy}
-            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium rounded-xl transition-colors"
+            className="w-full py-2.5 bg-ink hover:bg-black disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
           >
             {busy ? 'Adding…' : 'Add member'}
           </button>
         </form>
 
-        <hr className="border-slate-100" />
+        <hr className="border-rule" />
 
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Your link code</h3>
-          <p className="text-xs text-slate-500">Share this if your partner needs to add you instead.</p>
+          <h3 className="text-xs font-semibold text-ink uppercase tracking-wide">Your link code</h3>
+          <p className="text-xs text-ink-soft">Share this if your partner needs to add you instead.</p>
           <div className="flex gap-2">
-            <code className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 break-all select-all">
+            <code className="flex-1 px-3 py-2 text-xs bg-ledgerbar border border-rule rounded-lg text-ink break-all select-all">
               {uid}
             </code>
             <button
               onClick={copyCode}
               className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
-                copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
+                copied ? 'bg-credit text-white' : 'bg-ink hover:bg-ink text-white'
               }`}
             >
               {copied ? '✓ Copied' : 'Copy'}

@@ -16,32 +16,32 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
       <div className="p-5">
         {recent === undefined ? (
           <div className="flex items-center justify-center h-32">
-            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
           </div>
         ) : recent.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">
+          <p className="text-sm text-ink-soft text-center py-8">
             Nothing added yet. Newly added expenses will show up here.
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-rule">
             {recent.map((exp) => {
               const when = createdAtToDate(exp.createdAt);
               const category = getCategoryById(exp.categoryId);
               return (
                 <li key={exp.id} className="py-2.5 flex items-start gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-slate-800">
+                    <p className="text-sm text-ink">
                       {category?.name ?? 'Uncategorised'}
                       {exp.description && (
-                        <span className="text-slate-400"> · {exp.description}</span>
+                        <span className="text-ink-soft"> · {exp.description}</span>
                       )}
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-ink-soft mt-0.5">
                       {exp.createdByName ?? 'Someone'}
                       {when && <> · {formatRelativeTime(when)}</>}
                     </p>
                   </div>
-                  <span className="text-sm font-medium text-slate-900 whitespace-nowrap">
+                  <span className="font-mono text-sm font-medium text-ink whitespace-nowrap">
                     {formatMKD(exp.amount)}
                   </span>
                 </li>

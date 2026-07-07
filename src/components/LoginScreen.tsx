@@ -5,21 +5,21 @@ interface LoginScreenProps {
 
 export function LoginScreen({ onSignIn, error }: LoginScreenProps) {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-10 w-full max-w-sm text-center">
-        <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+    <div className="min-h-screen bg-ledgerbar flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-sm border border-rule p-10 w-full max-w-sm text-center">
+        <div className="w-14 h-14 bg-ink rounded-lg flex items-center justify-center mx-auto mb-6">
           <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h1 className="text-xl font-semibold text-slate-900 mb-2">Personal Finance</h1>
-        <p className="text-sm text-slate-500 mb-8">
+        <h1 className="text-xl font-semibold text-ink mb-2">Personal Finance</h1>
+        <p className="text-sm text-ink-soft mb-8">
           Track your income, expenses, and savings — synced across all your devices.
         </p>
 
         <button
           onClick={onSignIn}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl transition-colors shadow-sm"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-rule hover:border-rule-bold hover:bg-ledgerbar text-ink text-sm font-medium rounded-lg transition-colors shadow-sm"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -31,9 +31,9 @@ export function LoginScreen({ onSignIn, error }: LoginScreenProps) {
         </button>
 
         {error && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-left">
-            <p className="text-xs font-medium text-red-700 mb-1">Sign-in error</p>
-            <p className="text-xs text-red-600 break-all">{error}</p>
+          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg text-left">
+            <p className="text-xs font-medium text-debit mb-1">Sign-in error</p>
+            <p className="text-xs text-debit break-all">{error}</p>
           </div>
         )}
       </div>

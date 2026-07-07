@@ -25,30 +25,30 @@ export function MonthSetup({ month }: MonthSetupProps) {
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-md">
+      <div className="bg-white rounded-lg shadow-sm border border-rule p-8 w-full max-w-md">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-slate-900">Set up {formatMonthLabel(month)}</h2>
-          <p className="text-sm text-slate-500 mt-1">Enter your income and savings goal to get started.</p>
+          <h2 className="text-lg font-semibold text-ink">Set up {formatMonthLabel(month)}</h2>
+          <p className="text-sm text-ink-soft mt-1">Enter your income and savings goal to get started.</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">Monthly income</label>
+            <label className="block text-xs font-medium text-ink mb-1.5">Monthly income</label>
             <div className="relative">
               <input type="number" min="0" step="1" value={income} onChange={(e) => setIncome(e.target.value)} placeholder="0"
-                className="w-full px-4 py-2.5 pr-14 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400 pointer-events-none">ден</span>
+                className="w-full px-4 py-2.5 pr-14 text-sm border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition" />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ink-soft pointer-events-none">ден</span>
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">Savings goal</label>
+            <label className="block text-xs font-medium text-ink mb-1.5">Savings goal</label>
             <div className="relative">
               <input type="number" min="0" step="1" value={savingsGoal} onChange={(e) => setSavingsGoal(e.target.value)} placeholder="0"
-                className="w-full px-4 py-2.5 pr-14 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400 pointer-events-none">ден</span>
+                className="w-full px-4 py-2.5 pr-14 text-sm border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition" />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ink-soft pointer-events-none">ден</span>
             </div>
           </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
-          <button type="submit" className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors">
+          {error && <p className="text-xs text-debit">{error}</p>}
+          <button type="submit" className="w-full py-2.5 bg-ink hover:bg-black text-white text-sm font-medium rounded-lg transition-colors">
             Get started
           </button>
         </form>
