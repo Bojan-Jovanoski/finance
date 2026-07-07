@@ -12,6 +12,22 @@ import { auth } from '@/db/firebase';
 
 const PENDING_KEY = 'pendingSignIn';
 
+// Google accounts allowed to sign in, from VITE_ALLOWED_EMAILS (comma-separated).
+// Empty = no restriction. This is a UX gate only; actual data access is enforced
+// by household membership in firestore.rules.
+const ALLOWED_EMAILS = (import.meta.env.VITE_ALLOWED_EMAILS ?? '')
+  .split(',')
+  .map((e: string) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+function isAllowed(u: User): boolean {
+  if (ALLOWED_EMAILS.length === 0) return true;
+  return !!u.email && ALLOWED_EMAILS.includes(u.email.toLowerCase());
+}
+
+const NOT_ALLOWED_MESSAGE =
+  'This account is not authorized to use this app. Please sign in with an approved account.';
+
 export function useAuth() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -44,9 +60,18 @@ export function useAuth() {
     }
 
     return onAuthStateChanged(auth, (u) => {
-      if (localStorage.getItem(PENDING_KEY) !== 'true') {
-        setUser(u);
+      if (localStorage.getItem(PENDING_KEY) === 'true') return;
+
+      if (u && !isAllowed(u)) {
+        // Signed in with a non-approved account — reject and sign back out.
+        setAuthError(NOT_ALLOWED_MESSAGE);
+        setUser(null);
+        localStorage.removeItem(PENDING_KEY);
+        signOut(auth);
+        return;
       }
+
+      setUser(u);
     });
   }, []);
 

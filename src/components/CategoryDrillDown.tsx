@@ -128,7 +128,7 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
                       <th className="text-left py-2 pr-4 font-mono uppercase text-[10px] tracking-wider font-normal text-ink-soft cursor-pointer hover:text-ink select-none whitespace-nowrap w-full" onClick={() => toggleSort('description')}>
                         Description <SortIcon field="description" />
                       </th>
-                      <th className="text-right py-2 pr-4 font-mono uppercase text-[10px] tracking-wider font-normal text-ink-soft cursor-pointer hover:text-ink select-none whitespace-nowrap" onClick={() => toggleSort('amount')}>
+                      <th className="text-left py-2 pr-4 font-mono uppercase text-[10px] tracking-wider font-normal text-ink-soft cursor-pointer hover:text-ink select-none whitespace-nowrap" onClick={() => toggleSort('amount')}>
                         Amount <SortIcon field="amount" />
                       </th>
                       <th className="py-2 w-10" />
@@ -141,11 +141,11 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
                           onSave={() => saveEdit(exp.id!)} onCancel={() => { setEditingId(null); setEditError(''); }} />
                       ) : (
                         <tr key={exp.id} className="border-b border-ledgerbar hover:bg-ledgerbar group">
-                          <td className="py-2.5 pr-4 text-ink-soft whitespace-nowrap font-mono text-xs">{formatShortDate(exp.date)}</td>
+                          <td className="py-2.5 pr-4 text-ink-soft whitespace-nowrap font-mono text-sm">{formatShortDate(exp.date)}</td>
                           <td className="py-2.5 pr-4 text-ink truncate max-w-[200px]">
                             {exp.description || <span className="text-rule-bold italic">—</span>}
                           </td>
-                          <td className="py-2.5 pr-4 text-right font-mono font-medium text-ink whitespace-nowrap">{formatMKD(exp.amount)}</td>
+                          <td className="py-2.5 pr-4 text-left font-mono font-medium text-ink whitespace-nowrap">{formatMKD(exp.amount)}</td>
                           <td className="py-2.5">
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => startEdit(exp)} title="Edit"
@@ -171,7 +171,7 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
                       <td colSpan={2} className="pt-3 font-mono text-[11px] uppercase tracking-wider text-ink-soft">
                         {categoryExpenses.length} entr{categoryExpenses.length !== 1 ? 'ies' : 'y'}
                       </td>
-                      <td className="pt-3 pr-4 text-right font-mono font-semibold text-ink whitespace-nowrap">{formatMKD(total)}</td>
+                      <td className="pt-3 pr-4 text-left font-mono font-semibold text-ink whitespace-nowrap">{formatMKD(total)}</td>
                       <td />
                     </tr>
                   </tfoot>
