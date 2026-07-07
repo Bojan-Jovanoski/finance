@@ -11,6 +11,20 @@
   body {
     @apply bg-slate-50 text-slate-900;
   }
+
+  /* iOS Safari renders type=date with a grey fill, centered value and its own
+     height, ignoring most styling. Normalise it so it matches text inputs. */
+  input[type='date'] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
+  }
+  input[type='date']::-webkit-date-and-time-value {
+    text-align: left;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    margin-left: auto;
+  }
 }
 
 @layer utilities {
