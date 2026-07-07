@@ -53,7 +53,7 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
         </div>
         <div>
           <label className={fieldLabel}>Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-sm`} />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-2xl`} />
         </div>
       </div>
 

@@ -62,9 +62,9 @@ export function SummaryCards({ budget, totalSpent, month }: SummaryCardsProps) {
         ) : (
           <>
             <Line label="Income" value={formatMKD(budget.income)} />
-            <Line label="Savings goal" value={`−${formatMKD(budget.savingsGoal)}`} muted />
+            <Line label="Savings goal" value={`−${formatMKD(budget.savingsGoal)}`} tone="credit" />
             <Line label="Spendable" value={formatMKD(spendable)} rule />
-            <Line label="Spent this month" value={`−${formatMKD(totalSpent)}`} muted />
+            <Line label="Spent this month" value={`−${formatMKD(totalSpent)}`} tone="debit" />
             <Line
               label="Remaining"
               value={`${isOverBudget ? '−' : ''}${formatMKD(Math.abs(remaining))}`}
@@ -125,7 +125,7 @@ function Line({ label, value, muted, rule, grand, tone }: {
     >
       <span className={`text-sm ${muted ? 'text-ink-soft' : grand ? 'text-ink font-medium' : 'text-ink'}`}>{label}</span>
       <span className="flex-1 mx-2 border-b border-dotted border-rule-bold translate-y-[-3px]" />
-      <span className={`font-mono tabular-nums whitespace-nowrap ${grand ? `text-xl font-semibold ${toneClass}` : muted ? 'text-ink-soft' : 'text-ink'}`}>
+      <span className={`font-mono tabular-nums whitespace-nowrap ${grand ? `text-xl font-semibold ${toneClass}` : tone ? toneClass : muted ? 'text-ink-soft' : 'text-ink'}`}>
         {value}
       </span>
     </div>
