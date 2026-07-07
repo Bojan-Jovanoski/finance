@@ -18,6 +18,16 @@ export interface Expense {
   description: string;
   date: string; // "YYYY-MM-DD"
   month: string; // "YYYY-MM"
+  createdBy?: string; // UID of the member who added it
+  createdByName?: string; // display name captured at add time (for history)
+  createdAt?: unknown; // Firestore server timestamp
+}
+
+export interface Household {
+  id?: string;
+  members: string[]; // Firebase Auth UIDs allowed into this household
+  createdBy: string;
+  createdAt?: unknown;
 }
 
 export interface ExportData {

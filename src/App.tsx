@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import type { User } from 'firebase/auth';
 import { useAuth } from '@/hooks/useAuth';
+import { useHousehold } from '@/hooks/useHousehold';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { Header } from '@/components/Header';
 import { Dashboard } from '@/components/Dashboard';
@@ -8,16 +10,38 @@ import { CategoryDrillDown } from '@/components/CategoryDrillDown';
 import { CategoryManager } from '@/components/CategoryManager';
 import { DataPortability } from '@/components/DataPortability';
 import { LoginScreen } from '@/components/LoginScreen';
+import { HouseholdSetup } from '@/components/HouseholdSetup';
+import { HouseholdModal } from '@/components/HouseholdModal';
+import { HistoryModal } from '@/components/HistoryModal';
 import { useMonthBudget } from '@/hooks/useMonthBudget';
 import { currentMonth } from '@/utils/format';
 
-function AppContent({ uid }: { uid: string }) {
+function Spinner() {
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+function AppContent({
+  user,
+  members,
+  addMember,
+  onSignOut,
+}: {
+  user: User;
+  members: string[];
+  addMember: (memberUid: string) => Promise<void>;
+  onSignOut: () => void;
+}) {
   const [month, setMonth] = useState(currentMonth);
-  const { budget } = useMonthBudget(uid, month);
+  const { budget } = useMonthBudget(month);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [showDataPortability, setShowDataPortability] = useState(false);
-  const { signOut } = useAuth();
+  const [showHousehold, setShowHousehold] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   return (
     <>
@@ -26,7 +50,9 @@ function AppContent({ uid }: { uid: string }) {
         onMonthChange={setMonth}
         onOpenCategoryManager={() => setShowCategoryManager(true)}
         onOpenDataPortability={() => setShowDataPortability(true)}
-        onSignOut={signOut}
+        onOpenHousehold={() => setShowHousehold(true)}
+        onOpenHistory={() => setShowHistory(true)}
+        onSignOut={onSignOut}
       />
 
       <main className="max-w-6xl mx-auto px-4 py-6">
@@ -35,10 +61,9 @@ function AppContent({ uid }: { uid: string }) {
             <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : budget === null ? (
-          <MonthSetup uid={uid} month={month} />
+          <MonthSetup month={month} />
         ) : (
           <Dashboard
-            uid={uid}
             month={month}
             budget={budget}
             onSelectCategory={setSelectedCategoryId}
@@ -48,41 +73,67 @@ function AppContent({ uid }: { uid: string }) {
 
       {selectedCategoryId !== null && (
         <CategoryDrillDown
-          uid={uid}
           categoryId={selectedCategoryId}
           month={month}
           onClose={() => setSelectedCategoryId(null)}
         />
       )}
       {showCategoryManager && (
-        <CategoryManager uid={uid} onClose={() => setShowCategoryManager(false)} />
+        <CategoryManager onClose={() => setShowCategoryManager(false)} />
       )}
       {showDataPortability && (
-        <DataPortability uid={uid} onClose={() => setShowDataPortability(false)} />
+        <DataPortability onClose={() => setShowDataPortability(false)} />
       )}
+      {showHousehold && (
+        <HouseholdModal
+          uid={user.uid}
+          members={members}
+          onAddMember={addMember}
+          onClose={() => setShowHousehold(false)}
+        />
+      )}
+      {showHistory && <HistoryModal onClose={() => setShowHistory(false)} />}
     </>
   );
 }
 
-export default function App() {
-  const { user, signIn, authError, pendingRedirect } = useAuth();
+function HouseholdGate({ user, onSignOut }: { user: User; onSignOut: () => void }) {
+  const { household, status, createHousehold, addMember } = useHousehold(user.uid);
 
-  if (user === undefined || pendingRedirect) {
+  if (status === 'loading') return <Spinner />;
+
+  if (status !== 'linked') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <HouseholdSetup
+        uid={user.uid}
+        status={status}
+        onCreate={createHousehold}
+        onSignOut={onSignOut}
+      />
     );
   }
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans">
+      <AppContent
+        user={user}
+        members={household?.members ?? []}
+        addMember={addMember}
+        onSignOut={onSignOut}
+      />
+      <UpdatePrompt />
+    </div>
+  );
+}
+
+export default function App() {
+  const { user, signIn, signOut, authError, pendingRedirect } = useAuth();
+
+  if (user === undefined || pendingRedirect) return <Spinner />;
 
   if (user === null) {
     return <LoginScreen onSignIn={signIn} error={authError} />;
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      <AppContent uid={user.uid} />
-      <UpdatePrompt />
-    </div>
-  );
+  return <HouseholdGate user={user} onSignOut={signOut} />;
 }

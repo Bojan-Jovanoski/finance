@@ -5,14 +5,13 @@ import type { Budget } from '@/db/types';
 import { ConfirmDialog } from './ConfirmDialog';
 
 interface SummaryCardsProps {
-  uid: string;
   budget: Budget;
   totalSpent: number;
   month: string;
 }
 
-export function SummaryCards({ uid, budget, totalSpent, month }: SummaryCardsProps) {
-  const { saveBudget } = useMonthBudget(uid, month);
+export function SummaryCards({ budget, totalSpent, month }: SummaryCardsProps) {
+  const { saveBudget } = useMonthBudget(month);
   const [editing, setEditing] = useState(false);
   const [income, setIncome] = useState(String(budget.income));
   const [savingsGoal, setSavingsGoal] = useState(String(budget.savingsGoal));

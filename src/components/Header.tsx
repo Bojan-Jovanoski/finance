@@ -5,6 +5,8 @@ interface HeaderProps {
   onMonthChange: (month: string) => void;
   onOpenCategoryManager: () => void;
   onOpenDataPortability: () => void;
+  onOpenHousehold: () => void;
+  onOpenHistory: () => void;
   onSignOut: () => void;
 }
 
@@ -13,6 +15,8 @@ export function Header({
   onMonthChange,
   onOpenCategoryManager,
   onOpenDataPortability,
+  onOpenHousehold,
+  onOpenHistory,
   onSignOut,
 }: HeaderProps) {
   const isCurrentMonth = month === currentMonth();
@@ -69,6 +73,24 @@ export function Header({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
             <span className="hidden sm:inline">Backup</span>
+          </button>
+          <button
+            onClick={onOpenHistory}
+            className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+            aria-label="Recently added"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+          <button
+            onClick={onOpenHousehold}
+            className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+            aria-label="Household"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a3 3 0 10-2.5-4.66" />
+            </svg>
           </button>
           <button
             onClick={onOpenCategoryManager}

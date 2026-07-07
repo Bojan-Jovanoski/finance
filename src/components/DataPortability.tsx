@@ -5,14 +5,14 @@ import { firestore } from '@/db/firebase';
 import {
   collection, getDocs, doc, writeBatch, deleteDoc,
 } from 'firebase/firestore';
+import { HOUSEHOLD_ID } from '@/config/household';
 import type { ExportData, Budget, Expense, Category } from '@/db/types';
 
 interface DataPortabilityProps {
-  uid: string;
   onClose: () => void;
 }
 
-export function DataPortability({ uid, onClose }: DataPortabilityProps) {
+export function DataPortability({ onClose }: DataPortabilityProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingImport, setPendingImport] = useState<ExportData | null>(null);
   const [importError, setImportError] = useState('');
@@ -20,9 +20,9 @@ export function DataPortability({ uid, onClose }: DataPortabilityProps) {
 
   async function handleExport() {
     const [budgetsSnap, expensesSnap, categoriesSnap] = await Promise.all([
-      getDocs(collection(firestore, 'users', uid, 'budgets')),
-      getDocs(collection(firestore, 'users', uid, 'expenses')),
-      getDocs(collection(firestore, 'users', uid, 'categories')),
+      getDocs(collection(firestore, 'households', HOUSEHOLD_ID, 'budgets')),
+      getDocs(collection(firestore, 'households', HOUSEHOLD_ID, 'expenses')),
+      getDocs(collection(firestore, 'households', HOUSEHOLD_ID, 'categories')),
     ]);
 
     const data: ExportData = {
@@ -70,9 +70,9 @@ export function DataPortability({ uid, onClose }: DataPortabilityProps) {
 
     // Delete existing data
     const [budgetsSnap, expensesSnap, categoriesSnap] = await Promise.all([
-      getDocs(collection(firestore, 'users', uid, 'budgets')),
-      getDocs(collection(firestore, 'users', uid, 'expenses')),
-      getDocs(collection(firestore, 'users', uid, 'categories')),
+      getDocs(collection(firestore, 'households', HOUSEHOLD_ID, 'budgets')),
+      getDocs(collection(firestore, 'households', HOUSEHOLD_ID, 'expenses')),
+      getDocs(collection(firestore, 'households', HOUSEHOLD_ID, 'categories')),
     ]);
     await Promise.all([
       ...budgetsSnap.docs.map((d) => deleteDoc(d.ref)),
@@ -84,15 +84,15 @@ export function DataPortability({ uid, onClose }: DataPortabilityProps) {
     const writes: Array<() => void> = [];
     pendingImport.budgets.forEach((b) => {
       const { id, ...data } = b;
-      writes.push(() => batch.set(doc(firestore, 'users', uid, 'budgets', id), data));
+      writes.push(() => batch.set(doc(firestore, 'households', HOUSEHOLD_ID, 'budgets', id), data));
     });
     pendingImport.expenses.forEach((e) => {
       const { id, ...data } = e;
-      writes.push(() => batch.set(doc(firestore, 'users', uid, 'expenses', id ?? crypto.randomUUID()), data));
+      writes.push(() => batch.set(doc(firestore, 'households', HOUSEHOLD_ID, 'expenses', id ?? crypto.randomUUID()), data));
     });
     pendingImport.categories.forEach((c) => {
       const { id, ...data } = c;
-      writes.push(() => batch.set(doc(firestore, 'users', uid, 'categories', id ?? crypto.randomUUID()), data));
+      writes.push(() => batch.set(doc(firestore, 'households', HOUSEHOLD_ID, 'categories', id ?? crypto.randomUUID()), data));
     });
 
     let batch = writeBatch(firestore);

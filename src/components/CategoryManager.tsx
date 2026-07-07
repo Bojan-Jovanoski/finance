@@ -6,12 +6,11 @@ import { formatMKD } from '@/utils/format';
 import type { Category } from '@/db/types';
 
 interface CategoryManagerProps {
-  uid: string;
   onClose: () => void;
 }
 
-export function CategoryManager({ uid, onClose }: CategoryManagerProps) {
-  const { categories, addCategory, renameCategory, deleteCategory, setCategoryLimit } = useCategories(uid);
+export function CategoryManager({ onClose }: CategoryManagerProps) {
+  const { categories, addCategory, renameCategory, deleteCategory, setCategoryLimit } = useCategories();
   const [newName, setNewName] = useState('');
   const [addError, setAddError] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);

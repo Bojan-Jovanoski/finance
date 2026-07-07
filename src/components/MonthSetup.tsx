@@ -3,12 +3,11 @@ import { useMonthBudget } from '@/hooks/useMonthBudget';
 import { formatMonthLabel } from '@/utils/format';
 
 interface MonthSetupProps {
-  uid: string;
   month: string;
 }
 
-export function MonthSetup({ uid, month }: MonthSetupProps) {
-  const { saveBudget } = useMonthBudget(uid, month);
+export function MonthSetup({ month }: MonthSetupProps) {
+  const { saveBudget } = useMonthBudget(month);
   const [income, setIncome] = useState('');
   const [savingsGoal, setSavingsGoal] = useState('');
   const [error, setError] = useState('');

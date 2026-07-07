@@ -10,7 +10,6 @@ type SortField = 'date' | 'description' | 'amount';
 type SortDir = 'asc' | 'desc';
 
 interface CategoryDrillDownProps {
-  uid: string;
   categoryId: string;
   month: string;
   onClose: () => void;
@@ -22,9 +21,9 @@ interface EditState {
   date: string;
 }
 
-export function CategoryDrillDown({ uid, categoryId, month, onClose }: CategoryDrillDownProps) {
-  const { expenses, updateExpense, deleteExpense } = useExpenses(uid, month);
-  const { getCategoryById } = useCategories(uid);
+export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillDownProps) {
+  const { expenses, updateExpense, deleteExpense } = useExpenses(month);
+  const { getCategoryById } = useCategories();
 
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');

@@ -4,13 +4,12 @@ import { useExpenses } from '@/hooks/useExpenses';
 import { defaultDateForMonth } from '@/utils/format';
 
 interface QuickAddFormProps {
-  uid: string;
   month: string;
 }
 
-export function QuickAddForm({ uid, month }: QuickAddFormProps) {
-  const { categories } = useCategories(uid);
-  const { addExpense } = useExpenses(uid, month);
+export function QuickAddForm({ month }: QuickAddFormProps) {
+  const { categories } = useCategories();
+  const { addExpense } = useExpenses(month);
 
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
