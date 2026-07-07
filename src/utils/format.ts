@@ -27,6 +27,13 @@ export function nextMonth(month: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// First and last calendar day of a "YYYY-MM" month, for date input min/max.
+export function monthDateBounds(month: string): { min: string; max: string } {
+  const [year, m] = month.split('-').map(Number);
+  const lastDay = new Date(year, m, 0).getDate();
+  return { min: `${month}-01`, max: `${month}-${String(lastDay).padStart(2, '0')}` };
+}
+
 export function defaultDateForMonth(month: string): string {
   const today = new Date().toISOString().slice(0, 10);
   if (today.startsWith(month)) return today;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
 import { useExpenses } from '@/hooks/useExpenses';
-import { defaultDateForMonth } from '@/utils/format';
+import { defaultDateForMonth, monthDateBounds, formatMKD } from '@/utils/format';
 
 interface QuickAddFormProps {
   month: string;
@@ -11,8 +11,8 @@ const fieldLabel = 'block font-mono text-[10px] uppercase tracking-[0.14em] text
 const underline = 'w-full bg-transparent border-0 border-b border-rule-bold px-0.5 py-1.5 text-ink focus:outline-none focus:border-ink transition-colors';
 
 export function QuickAddForm({ month }: QuickAddFormProps) {
-  const { categories } = useCategories();
-  const { addExpense } = useExpenses(month);
+  const { categories, getCategoryById } = useCategories();
+  const { expenses, addExpense } = useExpenses(month);
 
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -20,6 +20,22 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
   const [date, setDate] = useState(defaultDateForMonth(month));
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const dateBounds = monthDateBounds(month);
+
+  // Warn if the entered amount would push the chosen category over its monthly limit.
+  const selectedCat = categoryId ? getCategoryById(categoryId) : undefined;
+  const limitWarning = (() => {
+    if (!selectedCat?.monthlyLimit) return null;
+    const num = parseFloat(amount);
+    if (isNaN(num) || num <= 0) return null;
+    const spentInCat = expenses
+      .filter((e) => e.categoryId === categoryId)
+      .reduce((s, e) => s + e.amount, 0);
+    const projected = spentInCat + num;
+    if (projected <= selectedCat.monthlyLimit) return null;
+    return `This puts ${selectedCat.name} at ${formatMKD(projected)}, over its ${formatMKD(selectedCat.monthlyLimit)} limit.`;
+  })();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,7 +69,7 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
         </div>
         <div>
           <label className={fieldLabel}>Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-2xl`} />
+          <input type="date" value={date} min={dateBounds.min} max={dateBounds.max} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-2xl`} />
         </div>
       </div>
 
@@ -63,6 +79,12 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
           <option value="">Select category…</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
+        {limitWarning && (
+          <p className="mt-1.5 flex items-start gap-1.5 text-xs text-debit">
+            <span aria-hidden>⚠</span>
+            <span>{limitWarning}</span>
+          </p>
+        )}
       </div>
 
       <div className="mt-4">

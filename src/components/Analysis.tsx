@@ -1,6 +1,6 @@
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
-import { formatMKD, formatShortDate } from '@/utils/format';
+import { formatMKD, formatShortDate, formatMonthLabel, prevMonth } from '@/utils/format';
 import type { Budget } from '@/db/types';
 
 interface AnalysisProps {
@@ -10,6 +10,7 @@ interface AnalysisProps {
 
 export function Analysis({ month, budget }: AnalysisProps) {
   const { expenses } = useExpenses(month);
+  const { expenses: prevExpenses } = useExpenses(prevMonth(month));
   const { getCategoryById } = useCategories();
 
   if (expenses.length === 0) {
@@ -58,6 +59,19 @@ export function Analysis({ month, budget }: AnalysisProps) {
 
   const topCatPct = total > 0 ? Math.round((topCatAmt / total) * 100) : 0;
 
+  // Month-over-month: previous month total + per-category movers
+  const prevTotal = prevExpenses.reduce((s, e) => s + e.amount, 0);
+  const totalDelta = total - prevTotal;
+  const totalDeltaPct = prevTotal > 0 ? Math.round((totalDelta / prevTotal) * 100) : null;
+
+  const prevCatTotals = new Map<string, number>();
+  for (const e of prevExpenses) prevCatTotals.set(e.categoryId, (prevCatTotals.get(e.categoryId) ?? 0) + e.amount);
+  const movers = [...new Set([...catTotals.keys(), ...prevCatTotals.keys()])]
+    .map((id) => ({ id, delta: (catTotals.get(id) ?? 0) - (prevCatTotals.get(id) ?? 0) }))
+    .filter((m) => m.delta !== 0)
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+    .slice(0, 4);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
@@ -84,6 +98,37 @@ export function Analysis({ month, budget }: AnalysisProps) {
               <SpenderRow name="Added before sharing" amount={unattributed} total={total} max={spenderMax} muted />
             )}
           </div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg border border-rule p-5">
+        <h2 className="eyebrow mb-4">Compared to {formatMonthLabel(prevMonth(month))}</h2>
+        {prevTotal === 0 ? (
+          <p className="text-sm text-ink-soft">No spending recorded last month to compare against.</p>
+        ) : (
+          <>
+            <div className="flex items-baseline justify-between border-b border-rule pb-3 mb-3">
+              <span className="text-sm text-ink">Total spend</span>
+              <span className="font-mono text-sm">
+                <span className="font-semibold text-ink">{formatMKD(total)}</span>
+                <span className={`ml-2 text-xs font-medium ${totalDelta > 0 ? 'text-debit' : 'text-credit'}`}>
+                  {totalDelta > 0 ? '▲' : '▼'} {formatMKD(Math.abs(totalDelta))}
+                  {totalDeltaPct !== null && ` (${totalDelta > 0 ? '+' : '−'}${Math.abs(totalDeltaPct)}%)`}
+                </span>
+              </span>
+            </div>
+            <p className="eyebrow mb-2">Biggest changes</p>
+            <ul className="space-y-1.5">
+              {movers.map(({ id, delta }) => (
+                <li key={id} className="flex items-center justify-between text-sm">
+                  <span className="text-ink">{getCategoryById(id)?.name ?? 'Uncategorised'}</span>
+                  <span className={`font-mono text-xs font-medium ${delta > 0 ? 'text-debit' : 'text-credit'}`}>
+                    {delta > 0 ? '▲' : '▼'} {formatMKD(Math.abs(delta))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </div>
 
