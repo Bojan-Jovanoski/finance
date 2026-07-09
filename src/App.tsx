@@ -15,6 +15,8 @@ import { HouseholdSetup } from '@/components/HouseholdSetup';
 import { HouseholdModal } from '@/components/HouseholdModal';
 import { HistoryModal } from '@/components/HistoryModal';
 import { useMonthBudget } from '@/hooks/useMonthBudget';
+import { useRecentExpenses } from '@/hooks/useRecentExpenses';
+import { useSeenHistory } from '@/hooks/useSeenHistory';
 import { currentMonth } from '@/utils/format';
 
 function Spinner() {
@@ -58,17 +60,28 @@ function AppContent({
   const [showDataPortability, setShowDataPortability] = useState(false);
   const [showHousehold, setShowHousehold] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [historyThreshold, setHistoryThreshold] = useState(0);
   const [view, setView] = useState<'overview' | 'analysis'>('overview');
+
+  const recent = useRecentExpenses();
+  const { unseenCount, lastSeenAt, markAllSeen } = useSeenHistory(recent, user.uid);
+
+  function openHistory() {
+    setHistoryThreshold(lastSeenAt); // freeze cutoff before marking seen, to flag new rows
+    markAllSeen();
+    setShowHistory(true);
+  }
 
   return (
     <>
       <Header
         month={month}
         onMonthChange={setMonth}
+        unseenCount={unseenCount}
         onOpenCategoryManager={() => setShowCategoryManager(true)}
         onOpenDataPortability={() => setShowDataPortability(true)}
         onOpenHousehold={() => setShowHousehold(true)}
-        onOpenHistory={() => setShowHistory(true)}
+        onOpenHistory={openHistory}
         onSignOut={onSignOut}
       />
 
@@ -119,7 +132,14 @@ function AppContent({
           onClose={() => setShowHousehold(false)}
         />
       )}
-      {showHistory && <HistoryModal onClose={() => setShowHistory(false)} />}
+      {showHistory && (
+        <HistoryModal
+          recent={recent}
+          currentUid={user.uid}
+          seenThreshold={historyThreshold}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </>
   );
 }

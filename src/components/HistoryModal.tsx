@@ -1,14 +1,17 @@
 import { Modal } from './Modal';
 import { useCategories } from '@/hooks/useCategories';
-import { useRecentExpenses, createdAtToDate } from '@/hooks/useRecentExpenses';
+import { createdAtToDate } from '@/hooks/useRecentExpenses';
 import { formatMKD, formatRelativeTime } from '@/utils/format';
+import type { Expense } from '@/db/types';
 
 interface HistoryModalProps {
+  recent: Expense[] | undefined;
+  currentUid: string;
+  seenThreshold: number; // items from others newer than this were unseen when opened
   onClose: () => void;
 }
 
-export function HistoryModal({ onClose }: HistoryModalProps) {
-  const recent = useRecentExpenses();
+export function HistoryModal({ recent, currentUid, seenThreshold, onClose }: HistoryModalProps) {
   const { getCategoryById } = useCategories();
 
   return (
@@ -27,13 +30,24 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
             {recent.map((exp) => {
               const when = createdAtToDate(exp.createdAt);
               const category = getCategoryById(exp.categoryId);
+              const isNew =
+                exp.createdBy !== currentUid &&
+                !!when &&
+                when.getTime() > seenThreshold;
               return (
                 <li key={exp.id} className="py-2.5 flex items-start gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-ink">
-                      {category?.name ?? 'Uncategorised'}
-                      {exp.description && (
-                        <span className="text-ink-soft"> · {exp.description}</span>
+                    <p className="text-sm text-ink flex items-center gap-2">
+                      <span>
+                        {category?.name ?? 'Uncategorised'}
+                        {exp.description && (
+                          <span className="text-ink-soft"> · {exp.description}</span>
+                        )}
+                      </span>
+                      {isNew && (
+                        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-debit border border-debit rounded px-1 leading-tight">
+                          New
+                        </span>
                       )}
                     </p>
                     <p className="text-xs text-ink-soft mt-0.5">

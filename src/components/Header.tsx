@@ -4,6 +4,7 @@ import { formatMonthLabel, prevMonth, nextMonth, currentMonth } from '@/utils/fo
 interface HeaderProps {
   month: string;
   onMonthChange: (month: string) => void;
+  unseenCount: number;
   onOpenCategoryManager: () => void;
   onOpenDataPortability: () => void;
   onOpenHousehold: () => void;
@@ -14,6 +15,7 @@ interface HeaderProps {
 export function Header({
   month,
   onMonthChange,
+  unseenCount,
   onOpenCategoryManager,
   onOpenDataPortability,
   onOpenHousehold,
@@ -99,11 +101,16 @@ export function Header({
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
+            {unseenCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-debit text-paper font-mono text-[10px] font-semibold leading-none">
+                {unseenCount > 9 ? '9+' : unseenCount}
+              </span>
+            )}
           </button>
 
           {menuOpen && (
             <div role="menu" className="absolute right-0 mt-1.5 w-52 bg-white rounded-lg shadow-lg border border-rule py-1.5 z-50">
-              <MenuItem label="Recently added" onClick={() => runAndClose(onOpenHistory)}>
+              <MenuItem label="Recently added" badge={unseenCount} onClick={() => runAndClose(onOpenHistory)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </MenuItem>
               <MenuItem label="Household" onClick={() => runAndClose(onOpenHousehold)}>
@@ -128,10 +135,11 @@ export function Header({
   );
 }
 
-function MenuItem({ label, onClick, children }: {
+function MenuItem({ label, onClick, children, badge = 0 }: {
   label: string;
   onClick: () => void;
   children: React.ReactNode;
+  badge?: number;
 }) {
   return (
     <button
@@ -143,6 +151,11 @@ function MenuItem({ label, onClick, children }: {
         {children}
       </svg>
       {label}
+      {badge > 0 && (
+        <span className="ml-auto min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-debit text-paper font-mono text-[10px] font-semibold leading-none">
+          {badge > 9 ? '9+' : badge}
+        </span>
+      )}
     </button>
   );
 }
