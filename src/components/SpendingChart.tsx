@@ -31,6 +31,10 @@ type ChartType = 'pie' | 'bar';
 export function SpendingChart({ expenses, categories, onSelectCategory }: SpendingChartProps) {
   const [chartType, setChartType] = useState<ChartType>('pie');
   const categoryMap = new Map(categories.map((c) => [c.id!, c]));
+  // Stable color per category: keyed by the category's position in the
+  // name-ordered categories list, so a category keeps its color regardless of
+  // how expenses reorder on add/edit/live-sync.
+  const colorByCategory = new Map(categories.map((c, i) => [c.id!, COLORS[i % COLORS.length]]));
 
   const grouped = expenses.reduce<Map<string, number>>((acc, exp) => {
     acc.set(exp.categoryId, (acc.get(exp.categoryId) ?? 0) + exp.amount);
@@ -38,11 +42,11 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
   }, new Map());
 
   const data: ChartEntry[] = Array.from(grouped.entries())
-    .map(([id, value], i) => ({
+    .map(([id, value]) => ({
       id,
       name: categoryMap.get(id)?.name ?? 'Unknown',
       value,
-      color: COLORS[i % COLORS.length],
+      color: colorByCategory.get(id) ?? COLORS[COLORS.length - 1],
       limit: categoryMap.get(id)?.monthlyLimit,
     }))
     .sort((a, b) => b.value - a.value);
