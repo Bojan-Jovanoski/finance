@@ -176,7 +176,7 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
                         overLimit ? 'text-debit' : nearLimit ? 'text-caution' : 'text-ink-soft'
                       }`}
                     >
-                      {overLimit ? `${limitPct}% · over limit` : `${limitPct}% of limit`}
+                      {limitPct}%
                     </span>
                   </div>
                 )}
