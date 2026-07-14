@@ -82,7 +82,7 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
         </div>
         <div>
           <label className={fieldLabel}>Date</label>
-          <input type="date" value={date} min={dateBounds.min} max={dateBounds.max} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-2xl`} />
+          <input type="date" value={date} min={dateBounds.min} max={dateBounds.max} onChange={(e) => setDate(e.target.value)} className={`${underline} font-mono text-lg sm:text-2xl`} />
         </div>
       </div>
 
