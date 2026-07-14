@@ -1,6 +1,7 @@
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { formatMKD, formatShortDate, formatMonthLabel, prevMonth } from '@/utils/format';
+import { SpendingTrend } from './SpendingTrend';
 import type { Budget } from '@/db/types';
 
 interface AnalysisProps {
@@ -15,8 +16,11 @@ export function Analysis({ month, budget }: AnalysisProps) {
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-rule p-8 text-center">
-        <p className="text-sm text-ink-soft">No expenses this month yet — add some to see the analysis.</p>
+      <div className="space-y-4">
+        <SpendingTrend month={month} />
+        <div className="bg-white rounded-lg border border-rule p-8 text-center">
+          <p className="text-sm text-ink-soft">No expenses this month yet — add some to see the analysis.</p>
+        </div>
       </div>
     );
   }
@@ -74,6 +78,8 @@ export function Analysis({ month, budget }: AnalysisProps) {
 
   return (
     <div className="space-y-4">
+      <SpendingTrend month={month} />
+
       <div className="grid grid-cols-2 gap-3">
         <MetricCard label="Biggest expense" value={formatMKD(biggest.amount)} mono
           sub={`${getCategoryById(biggest.categoryId)?.name ?? 'Uncategorised'}${biggest.description ? ` · ${biggest.description}` : ''} · ${formatShortDate(biggest.date)}`} />

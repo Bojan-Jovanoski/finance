@@ -15,6 +15,27 @@ export function formatMonthLabel(month: string): string {
   });
 }
 
+// Compact month label for charts / dense lists, e.g. "Jul" or "Jul '25".
+export function formatMonthShort(month: string, withYear = false): string {
+  const [year, m] = month.split('-').map(Number);
+  return new Date(year, m - 1, 1).toLocaleDateString('en-US', {
+    month: 'short',
+    ...(withYear ? { year: '2-digit' } : {}),
+  });
+}
+
+// The last `count` months up to and including `upTo` (default current month),
+// ordered oldest → newest. Handy for range queries and trend charts.
+export function recentMonths(count: number, upTo: string = currentMonth()): string[] {
+  const months: string[] = [];
+  let m = upTo;
+  for (let i = 0; i < count; i++) {
+    months.unshift(m);
+    m = prevMonth(m);
+  }
+  return months;
+}
+
 export function prevMonth(month: string): string {
   const [year, m] = month.split('-').map(Number);
   const d = new Date(year, m - 2, 1);

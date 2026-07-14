@@ -9,6 +9,7 @@ interface HeaderProps {
   onOpenDataPortability: () => void;
   onOpenHousehold: () => void;
   onOpenHistory: () => void;
+  onOpenTransactions: () => void;
   onSignOut: () => void;
 }
 
@@ -20,6 +21,7 @@ export function Header({
   onOpenDataPortability,
   onOpenHousehold,
   onOpenHistory,
+  onOpenTransactions,
   onSignOut,
 }: HeaderProps) {
   const isCurrentMonth = month === currentMonth();
@@ -112,6 +114,9 @@ export function Header({
             <div role="menu" className="absolute right-0 mt-1.5 w-52 bg-white rounded-lg shadow-lg border border-rule py-1.5 z-50">
               <MenuItem label="Recently added" badge={unseenCount} onClick={() => runAndClose(onOpenHistory)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </MenuItem>
+              <MenuItem label="Transactions" onClick={() => runAndClose(onOpenTransactions)}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </MenuItem>
               <MenuItem label="Household" onClick={() => runAndClose(onOpenHousehold)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a3 3 0 10-2.5-4.66" />

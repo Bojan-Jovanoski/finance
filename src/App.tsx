@@ -14,6 +14,7 @@ import { LoginScreen } from '@/components/LoginScreen';
 import { HouseholdSetup } from '@/components/HouseholdSetup';
 import { HouseholdModal } from '@/components/HouseholdModal';
 import { HistoryModal } from '@/components/HistoryModal';
+import { TransactionsModal } from '@/components/TransactionsModal';
 import { useMonthBudget } from '@/hooks/useMonthBudget';
 import { useRecentExpenses } from '@/hooks/useRecentExpenses';
 import { useSeenHistory } from '@/hooks/useSeenHistory';
@@ -60,6 +61,7 @@ function AppContent({
   const [showDataPortability, setShowDataPortability] = useState(false);
   const [showHousehold, setShowHousehold] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showTransactions, setShowTransactions] = useState(false);
   const [historyThreshold, setHistoryThreshold] = useState(0);
   const [view, setView] = useState<'overview' | 'analysis'>('overview');
 
@@ -82,6 +84,7 @@ function AppContent({
         onOpenDataPortability={() => setShowDataPortability(true)}
         onOpenHousehold={() => setShowHousehold(true)}
         onOpenHistory={openHistory}
+        onOpenTransactions={() => setShowTransactions(true)}
         onSignOut={onSignOut}
       />
 
@@ -103,6 +106,7 @@ function AppContent({
                 month={month}
                 budget={budget}
                 onSelectCategory={setSelectedCategoryId}
+                onManageCategories={() => setShowCategoryManager(true)}
               />
             ) : (
               <Analysis month={month} budget={budget} />
@@ -139,6 +143,9 @@ function AppContent({
           seenThreshold={historyThreshold}
           onClose={() => setShowHistory(false)}
         />
+      )}
+      {showTransactions && (
+        <TransactionsModal onClose={() => setShowTransactions(false)} />
       )}
     </>
   );
