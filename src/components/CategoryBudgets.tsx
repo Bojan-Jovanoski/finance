@@ -66,12 +66,12 @@ export function CategoryBudgets({ categories, expenses, onSelectCategory, onMana
                   </div>
                   <div className="h-1.5 bg-ledgerbar border border-rule rounded-sm overflow-hidden">
                     <div
-                      className={`h-full ${over ? 'bg-debit' : near ? 'bg-amber-500' : 'bg-credit'}`}
+                      className={`h-full ${over ? 'bg-debit' : near ? 'bg-caution' : 'bg-credit'}`}
                       style={{ width: `${Math.min(100, r.pct)}%` }}
                     />
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span className={`font-mono text-[11px] ${over ? 'text-debit' : near ? 'text-amber-600' : 'text-ink-soft'}`}>
+                    <span className={`font-mono text-[11px] ${over ? 'text-debit' : near ? 'text-caution' : 'text-ink-soft'}`}>
                       {r.pct}% used
                     </span>
                     <span className={`font-mono text-[11px] ${over ? 'text-debit' : 'text-ink-soft'}`}>

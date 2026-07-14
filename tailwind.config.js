@@ -21,6 +21,7 @@ export default {
         },
         debit: '#9C2A24', // over budget / negative — "in the red"
         credit: '#3B5540', // positive balance / success
+        caution: '#A66A00', // nearing a limit / short of goal — earthy ledger ochre
       },
     },
   },

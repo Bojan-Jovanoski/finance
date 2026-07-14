@@ -86,7 +86,7 @@ export function SavingsTracker({ month }: SavingsTrackerProps) {
                   const met = d.saved !== null && d.goal !== null && d.saved >= d.goal;
                   const positive = d.saved !== null && d.saved >= 0;
                   return (
-                    <Cell key={d.month} fill={met ? '#3B5540' : positive ? '#d69a2e' : '#9C2A24'} />
+                    <Cell key={d.month} fill={met ? '#3B5540' : positive ? '#A66A00' : '#9C2A24'} />
                   );
                 })}
               </Bar>
@@ -104,7 +104,7 @@ export function SavingsTracker({ month }: SavingsTrackerProps) {
 
           <div className="mt-2 flex items-center gap-4 font-mono text-[10px] uppercase tracking-wider text-ink-soft">
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-credit" /> Met goal</span>
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Short</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-caution" /> Short</span>
             <span className="flex items-center gap-1.5"><span className="w-4 border-t border-dashed border-ink" /> Goal</span>
           </div>
 

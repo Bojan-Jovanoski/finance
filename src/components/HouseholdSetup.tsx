@@ -36,7 +36,7 @@ export function HouseholdSetup({ uid, status, onCreate, onSignOut }: HouseholdSe
 
   return (
     <div className="min-h-screen bg-ledgerbar flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-sm border border-rule p-8 w-full max-w-md">
+      <div className="bg-white rounded-md border border-rule-bold p-8 w-full max-w-md">
         {status === 'none' ? (
           <>
             <h2 className="text-lg font-semibold text-ink">Set up your shared household</h2>

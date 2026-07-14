@@ -140,7 +140,7 @@ export function CategoryManager({ onClose }: CategoryManagerProps) {
                       disabled={isOther(cat)}
                       title={isOther(cat) ? '"Other" cannot be deleted' : 'Delete'}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors flex-shrink-0 ${
-                        isOther(cat) ? 'text-rule cursor-not-allowed' : 'text-ink-soft hover:text-debit hover:bg-red-50'
+                        isOther(cat) ? 'text-rule cursor-not-allowed' : 'text-ink-soft hover:text-debit hover:bg-debit/10'
                       }`}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

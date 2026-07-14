@@ -25,7 +25,7 @@ export function MonthSetup({ month }: MonthSetupProps) {
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="bg-white rounded-lg shadow-sm border border-rule p-8 w-full max-w-md">
+      <div className="bg-white rounded-md border border-rule-bold p-8 w-full max-w-md">
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-ink">Set up {formatMonthLabel(month)}</h2>
           <p className="text-sm text-ink-soft mt-1">Enter your income and savings goal to get started.</p>

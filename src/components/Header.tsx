@@ -111,7 +111,7 @@ export function Header({
           </button>
 
           {menuOpen && (
-            <div role="menu" className="absolute right-0 mt-1.5 w-52 bg-white rounded-lg shadow-lg border border-rule py-1.5 z-50">
+            <div role="menu" className="absolute right-0 mt-1.5 w-52 bg-white rounded-md shadow-lg border border-rule-bold py-1.5 z-50">
               <MenuItem label="Recently added" badge={unseenCount} onClick={() => runAndClose(onOpenHistory)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </MenuItem>

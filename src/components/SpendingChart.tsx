@@ -170,7 +170,7 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
                         overLimit
                           ? 'text-debit border-debit/40 bg-debit/10'
                           : nearLimit
-                          ? 'text-amber-600 border-amber-500/40 bg-amber-500/10'
+                          ? 'text-caution border-caution/40 bg-caution/10'
                           : 'text-credit border-credit/30 bg-credit/10'
                       }`}
                     >
@@ -182,7 +182,7 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
                   <div className="mt-1 flex items-center gap-1.5">
                     <div className="flex-1 h-1 bg-ledgerbar rounded-full overflow-hidden max-w-[120px]">
                       <div
-                        className={`h-full ${overLimit ? 'bg-debit' : nearLimit ? 'bg-amber-500' : 'bg-credit'}`}
+                        className={`h-full ${overLimit ? 'bg-debit' : nearLimit ? 'bg-caution' : 'bg-credit'}`}
                         style={{ width: `${Math.min(100, limitPct!)}%` }}
                       />
                     </div>
