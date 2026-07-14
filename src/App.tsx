@@ -123,7 +123,10 @@ function AppContent({
         />
       )}
       {showCategoryManager && (
-        <CategoryManager onClose={() => setShowCategoryManager(false)} />
+        <CategoryManager
+          onClose={() => setShowCategoryManager(false)}
+          spendable={budget ? budget.income - budget.savingsGoal : undefined}
+        />
       )}
       {showDataPortability && (
         <DataPortability onClose={() => setShowDataPortability(false)} />

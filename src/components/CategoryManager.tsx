@@ -7,9 +7,12 @@ import type { Category } from '@/db/types';
 
 interface CategoryManagerProps {
   onClose: () => void;
+  // Spendable amount (income − savings goal) of the selected month, if set.
+  // A category's monthly limit can't exceed it.
+  spendable?: number;
 }
 
-export function CategoryManager({ onClose }: CategoryManagerProps) {
+export function CategoryManager({ onClose, spendable }: CategoryManagerProps) {
   const { categories, addCategory, renameCategory, deleteCategory, setCategoryLimit } = useCategories();
   const [newName, setNewName] = useState('');
   const [addError, setAddError] = useState('');
@@ -46,6 +49,10 @@ export function CategoryManager({ onClose }: CategoryManagerProps) {
     const limitVal = editLimit.trim() === '' ? null : parseFloat(editLimit);
     if (limitVal !== null && (isNaN(limitVal) || limitVal <= 0)) {
       setEditError('Limit must be a positive number.');
+      return;
+    }
+    if (limitVal !== null && spendable !== undefined && limitVal > spendable) {
+      setEditError(`Limit can't exceed this month's spendable amount (${formatMKD(spendable)}).`);
       return;
     }
     const cat = categories.find((c) => c.id === id);
@@ -97,6 +104,9 @@ export function CategoryManager({ onClose }: CategoryManagerProps) {
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink-soft pointer-events-none">ден</span>
                     </div>
+                    {spendable !== undefined && (
+                      <p className="text-xs text-ink-soft">Spendable this month: {formatMKD(spendable)}</p>
+                    )}
                     {editError && <p className="text-xs text-debit">{editError}</p>}
                     <div className="flex gap-2">
                       <button
