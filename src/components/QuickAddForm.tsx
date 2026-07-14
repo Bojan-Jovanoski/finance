@@ -42,12 +42,25 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
     const num = parseFloat(amount);
     if (!amount || isNaN(num) || num <= 0) { setError('Enter a positive amount.'); return; }
     if (!categoryId) { setError('Select a category.'); return; }
+    const entry = { amount: Math.round(num), categoryId, description: description.trim(), date };
+
+    // Optimistic: with offline persistence the write is durably queued in
+    // IndexedDB immediately (the promise only resolves once the server acks,
+    // which never happens while offline). So we confirm as soon as it's queued
+    // and only surface an error if the write is actually rejected.
     setError('');
-    await addExpense({ amount: Math.round(num), categoryId, description: description.trim(), date });
     setAmount('');
     setDescription('');
     setSuccess(true);
     setTimeout(() => setSuccess(false), 1500);
+
+    try {
+      await addExpense(entry);
+    } catch (err) {
+      console.error('Failed to record expense', err);
+      setSuccess(false);
+      setError(`Could not save ${formatMKD(entry.amount)}. Please add it again.`);
+    }
   }
 
   return (
