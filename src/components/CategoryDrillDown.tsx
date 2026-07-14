@@ -29,7 +29,7 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editState, setEditState] = useState<EditState>({ amount: '', description: '', date: '' });
+  const [editState, setEditState] = useState<EditState>({ amount: '', description: '', date: '', categoryId: '' });
   const [editError, setEditError] = useState('');
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
