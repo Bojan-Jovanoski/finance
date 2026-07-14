@@ -48,6 +48,21 @@ export function nextMonth(month: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+export function isCurrentMonth(month: string): boolean {
+  return month === currentMonth();
+}
+
+// Number of calendar days in a "YYYY-MM" month.
+export function daysInMonth(month: string): number {
+  const [year, m] = month.split('-').map(Number);
+  return new Date(year, m, 0).getDate();
+}
+
+// Today's day-of-month (1–31). Used to project month-end spending pace.
+export function currentDayOfMonth(): number {
+  return new Date().getDate();
+}
+
 // First and last calendar day of a "YYYY-MM" month, for date input min/max.
 export function monthDateBounds(month: string): { min: string; max: string } {
   const [year, m] = month.split('-').map(Number);

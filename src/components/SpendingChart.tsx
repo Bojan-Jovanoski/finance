@@ -162,17 +162,32 @@ export function SpendingChart({ expenses, categories, onSelectCategory }: Spendi
             >
               <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-ink truncate">{entry.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-ink truncate">{entry.name}</p>
+                  {entry.limit && (
+                    <span
+                      className={`shrink-0 font-mono text-[10px] font-semibold leading-none px-1.5 py-0.5 rounded-sm border ${
+                        overLimit
+                          ? 'text-debit border-debit/40 bg-debit/10'
+                          : nearLimit
+                          ? 'text-amber-600 border-amber-500/40 bg-amber-500/10'
+                          : 'text-credit border-credit/30 bg-credit/10'
+                      }`}
+                    >
+                      {overLimit ? `${limitPct}% · over` : `${limitPct}% of limit`}
+                    </span>
+                  )}
+                </div>
                 {entry.limit && (
                   <div className="mt-1 flex items-center gap-1.5">
-                    <div className="flex-1 h-1 bg-ledgerbar rounded-full overflow-hidden max-w-[80px]">
+                    <div className="flex-1 h-1 bg-ledgerbar rounded-full overflow-hidden max-w-[120px]">
                       <div
                         className={`h-full ${overLimit ? 'bg-debit' : nearLimit ? 'bg-amber-500' : 'bg-credit'}`}
                         style={{ width: `${Math.min(100, limitPct!)}%` }}
                       />
                     </div>
-                    <span className={`font-mono text-[11px] ${overLimit ? 'text-debit' : nearLimit ? 'text-amber-600' : 'text-ink-soft'}`}>
-                      {limitPct}% of {formatMKD(entry.limit)}
+                    <span className="font-mono text-[11px] text-ink-soft">
+                      {formatMKD(entry.value)} / {formatMKD(entry.limit)}
                     </span>
                   </div>
                 )}
