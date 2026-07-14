@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatMKD } from '@/utils/format';
+import { formatMKD, isCurrentMonth, daysInMonth, currentDayOfMonth } from '@/utils/format';
 import { useMonthBudget } from '@/hooks/useMonthBudget';
 import type { Budget } from '@/db/types';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -22,6 +22,17 @@ export function SummaryCards({ budget, totalSpent, month }: SummaryCardsProps) {
   const remaining = spendable - totalSpent;
   const isOverBudget = remaining < 0;
   const spentPct = spendable > 0 ? Math.min(100, Math.round((totalSpent / spendable) * 100)) : 0;
+
+  // What actually ends up saved = income − spend (identity: savingsGoal + remaining).
+  // When over budget this drops below the goal, so overspending really does eat savings.
+  const actualSaved = budget.income - totalSpent;
+
+  // Month-end projection at the current spending pace (current month only).
+  const showProjection = isCurrentMonth(month) && totalSpent > 0;
+  const dim = daysInMonth(month);
+  const dayNo = Math.min(currentDayOfMonth(), dim);
+  const projected = dayNo > 0 ? Math.round((totalSpent / dayNo) * dim) : totalSpent;
+  const projectedOver = projected - spendable; // positive → projected to overshoot spendable
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -84,6 +95,28 @@ export function SummaryCards({ budget, totalSpent, month }: SummaryCardsProps) {
                 <span className="font-mono text-[11px] text-ink-soft">{formatMKD(spendable)}</span>
               </div>
             </div>
+
+            {showProjection && (
+              <div className="mt-3 flex items-baseline justify-between border-t border-rule pt-2.5">
+                <span className="text-xs text-ink-soft">Projected month-end pace</span>
+                <span className="font-mono text-xs">
+                  <span className="font-medium text-ink">{formatMKD(projected)}</span>
+                  <span className={`ml-2 ${projectedOver > 0 ? 'text-debit' : 'text-credit'}`}>
+                    {projectedOver > 0
+                      ? `${formatMKD(projectedOver)} over`
+                      : `${formatMKD(-projectedOver)} to spare`}
+                  </span>
+                </span>
+              </div>
+            )}
+
+            {isOverBudget && (
+              <p className="mt-2.5 text-xs text-debit leading-relaxed">
+                {actualSaved >= 0
+                  ? `Over budget — you'll actually save ${formatMKD(actualSaved)} of your ${formatMKD(budget.savingsGoal)} goal (${formatMKD(budget.savingsGoal - actualSaved)} short).`
+                  : `Over budget — spending exceeds income by ${formatMKD(-actualSaved)}, dipping into savings.`}
+              </p>
+            )}
 
             <button
               onClick={() => { setIncome(String(budget.income)); setSavingsGoal(String(budget.savingsGoal)); setEditing(true); }}
