@@ -4,7 +4,7 @@ import { ConfirmDialog } from './ConfirmDialog';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { formatMKD, formatShortDate, formatMonthLabel } from '@/utils/format';
-import type { Expense } from '@/db/types';
+import type { Category, Expense } from '@/db/types';
 
 type SortField = 'date' | 'description' | 'amount';
 type SortDir = 'asc' | 'desc';
@@ -19,11 +19,12 @@ interface EditState {
   amount: string;
   description: string;
   date: string;
+  categoryId: string;
 }
 
 export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillDownProps) {
   const { expenses, updateExpense, deleteExpense } = useExpenses(month);
-  const { getCategoryById } = useCategories();
+  const { categories, getCategoryById } = useCategories();
 
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
@@ -57,14 +58,20 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
 
   function startEdit(exp: Expense) {
     setEditingId(exp.id!);
-    setEditState({ amount: String(exp.amount), description: exp.description, date: exp.date });
+    setEditState({ amount: String(exp.amount), description: exp.description, date: exp.date, categoryId: exp.categoryId });
     setEditError('');
   }
 
   async function saveEdit(id: string) {
     const num = parseFloat(editState.amount);
     if (isNaN(num) || num <= 0) { setEditError('Enter a positive amount.'); return; }
-    await updateExpense(id, { amount: Math.round(num), description: editState.description.trim(), date: editState.date });
+    if (!editState.categoryId) { setEditError('Select a category.'); return; }
+    await updateExpense(id, {
+      amount: Math.round(num),
+      description: editState.description.trim(),
+      date: editState.date,
+      categoryId: editState.categoryId,
+    });
     setEditingId(null);
     setEditError('');
   }
@@ -137,7 +144,7 @@ export function CategoryDrillDown({ categoryId, month, onClose }: CategoryDrillD
                   <tbody>
                     {sorted.map((exp) =>
                       editingId === exp.id ? (
-                        <EditRow key={exp.id} state={editState} error={editError} onChange={setEditState}
+                        <EditRow key={exp.id} state={editState} error={editError} categories={categories} onChange={setEditState}
                           onSave={() => saveEdit(exp.id!)} onCancel={() => { setEditingId(null); setEditError(''); }} />
                       ) : (
                         <tr key={exp.id} className="border-b border-ledgerbar hover:bg-ledgerbar group">
@@ -211,26 +218,33 @@ function Line({ label, value, rule, grand, tone }: {
   );
 }
 
-function EditRow({ state, error, onChange, onSave, onCancel }: {
-  state: EditState; error: string;
+function EditRow({ state, error, categories, onChange, onSave, onCancel }: {
+  state: EditState; error: string; categories: Category[];
   onChange: (s: EditState) => void; onSave: () => void; onCancel: () => void;
 }) {
   return (
     <tr className="border-b border-rule bg-ledgerbar/50">
-      <td className="py-1.5 pr-3">
+      <td className="py-1.5 pr-3 align-top">
         <input type="date" value={state.date} onChange={(e) => onChange({ ...state, date: e.target.value })}
           className="w-full px-2 py-1 text-xs border border-rule rounded-md focus:outline-none focus:ring-1 focus:ring-ink" />
       </td>
-      <td className="py-1.5 pr-3">
-        <input type="text" value={state.description} onChange={(e) => onChange({ ...state, description: e.target.value })} placeholder="Description"
-          className="w-full px-2 py-1 text-xs border border-rule rounded-md focus:outline-none focus:ring-1 focus:ring-ink" />
+      <td className="py-1.5 pr-3 align-top">
+        <div className="space-y-1.5">
+          <select value={state.categoryId} onChange={(e) => onChange({ ...state, categoryId: e.target.value })}
+            className="w-full px-2 py-1 text-xs border border-rule rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-ink"
+            title="Move to category">
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <input type="text" value={state.description} onChange={(e) => onChange({ ...state, description: e.target.value })} placeholder="Description"
+            className="w-full px-2 py-1 text-xs border border-rule rounded-md focus:outline-none focus:ring-1 focus:ring-ink" />
+        </div>
         {error && <p className="text-xs text-debit mt-0.5">{error}</p>}
       </td>
-      <td className="py-1.5 pr-3">
+      <td className="py-1.5 pr-3 align-top">
         <input type="number" min="1" step="1" value={state.amount} onChange={(e) => onChange({ ...state, amount: e.target.value })}
           className="w-full px-2 py-1 text-xs text-right border border-rule rounded-md focus:outline-none focus:ring-1 focus:ring-ink" />
       </td>
-      <td className="py-1.5">
+      <td className="py-1.5 align-top">
         <div className="flex items-center gap-1">
           <button onClick={onSave} title="Save" className="w-6 h-6 flex items-center justify-center rounded text-credit hover:bg-ledgerbar transition-colors">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
