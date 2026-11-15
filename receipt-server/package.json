@@ -1,0 +1,16 @@
+{
+  "name": "receipt-server",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Reads receipt photos with a local Ollama vision model and suggests an expense entry.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "start": "node --env-file=.env server.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.1"
+  }
+}

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
 import { useExpenses } from '@/hooks/useExpenses';
 import { defaultDateForMonth, monthDateBounds, formatMKD } from '@/utils/format';
+import { receiptScanEnabled, scanReceipt, warmReceiptModel } from '@/utils/receiptScan';
 
 interface QuickAddFormProps {
   month: string;
@@ -20,8 +21,61 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
   const [date, setDate] = useState(defaultDateForMonth(month));
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanNote, setScanNote] = useState('');
+  const [online, setOnline] = useState(() => navigator.onLine);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const dateBounds = monthDateBounds(month);
+
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    return () => {
+      window.removeEventListener('online', update);
+      window.removeEventListener('offline', update);
+    };
+  }, []);
+
+  function pickPicture() {
+    warmReceiptModel();
+    fileInput.current?.click();
+  }
+
+  // Fills the form from a receipt photo. Nothing is saved until the user taps Record.
+  async function handlePicture(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setError('');
+    setScanNote('');
+    setScanning(true);
+    try {
+      const result = await scanReceipt(file, categories);
+      if (!result.amount) {
+        setError('Could not find a total on that picture. Enter it by hand.');
+        return;
+      }
+      setAmount(String(result.amount));
+      if (result.categoryId) setCategoryId(result.categoryId);
+      if (result.merchant) setDescription(result.merchant);
+
+      const notes = ['Filled from receipt — check and record.'];
+      if (result.date && result.date >= dateBounds.min && result.date <= dateBounds.max) {
+        setDate(result.date);
+      } else if (result.date) {
+        notes.push(`Receipt is dated ${result.date}, outside this month, so the date was left as is.`);
+      }
+      if (!result.categoryId) notes.push('Pick a category.');
+      setScanNote(notes.join(' '));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not read the receipt.');
+    } finally {
+      setScanning(false);
+    }
+  }
 
   // Warn if the entered amount would push the chosen category over its monthly limit.
   const selectedCat = categoryId ? getCategoryById(categoryId) : undefined;
@@ -49,6 +103,7 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
     // which never happens while offline). So we confirm as soon as it's queued
     // and only surface an error if the write is actually rejected.
     setError('');
+    setScanNote('');
     setAmount('');
     setDescription('');
     setSuccess(true);
@@ -109,6 +164,7 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
         />
       </div>
 
+      {scanNote && <p className="text-xs text-credit mt-3">{scanNote}</p>}
       {error && <p className="text-xs text-debit mt-3">{error}</p>}
 
       <button
@@ -119,6 +175,18 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
       >
         {success ? '✓ Recorded' : 'Record expense'}
       </button>
+
+      {receiptScanEnabled && online && (
+        <>
+          <input ref={fileInput} type="file" accept="image/*" onChange={handlePicture} className="hidden" />
+          <button
+            type="button" onClick={pickPicture} disabled={scanning}
+            className="mt-2 w-full py-2.5 border border-rule-bold font-mono text-xs uppercase tracking-[0.1em] text-ink hover:bg-ledgerbar transition-colors disabled:opacity-60 disabled:cursor-wait"
+          >
+            {scanning ? 'Reading receipt…' : 'Add from picture'}
+          </button>
+        </>
+      )}
     </form>
   );
 }

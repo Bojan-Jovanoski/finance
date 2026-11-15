@@ -70,6 +70,23 @@ works.
 - **History** — a live feed of recently added items across the household, with an
   unread badge for entries added by your partner.
 - **Backup / Restore** — export all data as JSON; import to restore.
+- **Add from picture** — photograph a receipt, invoice or slip and the form fills
+  itself in (total, date, shop, category). See [Receipt scanning](#receipt-scanning).
+
+## Receipt scanning
+
+The **Add from picture** button sends a receipt photo to a small server on the
+home PC (`receipt-server/`). A local vision model (Ollama + `qwen3-vl`) reads the
+final total, the date and the shop, and picks one of your categories. The form is
+only pre-filled: you check it and tap Record. Typing an entry by hand works as
+before.
+
+- Photos are never stored: shrunk on the phone, read in memory on the PC, then dropped.
+- Only signed-in accounts in the server's `ALLOWED_EMAILS` can use it.
+- The button appears only when `VITE_RECEIPT_API_URL` is set (in `.env.local`,
+  and as a GitHub Actions secret for the live site) and the phone is online.
+
+**Setting up the home PC (Windows): [receipt-server/SETUP-WINDOWS.md](receipt-server/SETUP-WINDOWS.md).**
 
 ## Data model
 

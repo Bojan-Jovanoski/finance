@@ -4,3 +4,7 @@ dist
 *.local
 .env.local
 .env.*.local
+
+# receipt-server (home PC)
+receipt-server/.env
+receipt-server/logs/
