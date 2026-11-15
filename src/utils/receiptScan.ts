@@ -4,7 +4,7 @@ import type { Category } from '@/db/types';
 // Receipt scanning goes to the self-hosted receipt-server (see receipt-server/).
 // The photo is only resized in memory and sent once; it is never stored.
 const API_URL = (import.meta.env.VITE_RECEIPT_API_URL ?? '').replace(/\/$/, '');
-const MAX_SIDE = 1600;
+const MAX_SIDE = 1280;
 const TIMEOUT_MS = 90_000;
 
 export const receiptScanEnabled = API_URL !== '';
