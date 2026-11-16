@@ -128,6 +128,18 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
     return `This puts ${selectedCat.name} at ${formatMKD(projected)}, over its ${formatMKD(selectedCat.monthlyLimit)} limit.`;
   })();
 
+  const isDirty = amount !== '' || categoryId !== '' || description !== '' || date !== defaultDateForMonth(month) || !!scanNote || !!error;
+
+  function clearForm() {
+    setAmount('');
+    setCategoryId('');
+    setDescription('');
+    setDate(defaultDateForMonth(month));
+    setError('');
+    setScanNote('');
+    setScannedMerchant(null);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const num = parseFloat(amount);
@@ -166,6 +178,14 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
       <span className="absolute -top-2 left-4 bg-white px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft">
         New entry
       </span>
+      {isDirty && !scanning && (
+        <button
+          type="button" onClick={clearForm}
+          className="absolute -top-2 right-4 bg-white px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft hover:text-ink transition-colors"
+        >
+          Clear
+        </button>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
