@@ -64,6 +64,10 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
       if (memo) setDescription(memo.slice(0, 200));
 
       const notes = ['Filled from receipt — check and record.'];
+      if (result.original) {
+        const { amount: orig, currency, rate } = result.original;
+        notes.push(`Converted from ${orig.toLocaleString('de-DE')} ${currency} at ${rate.toLocaleString('de-DE')} ден.`);
+      }
       if (result.date && result.date >= dateBounds.min && result.date <= dateBounds.max) {
         setDate(result.date);
       } else if (result.date) {

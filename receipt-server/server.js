@@ -124,10 +124,14 @@ function buildPrompt(categoryNames) {
     'You are reading a photo of a receipt, invoice or payment slip from North Macedonia.',
     'Extract the following and answer only with JSON matching the schema.',
     '',
-    'total: the FINAL amount paid, in Macedonian denars (MKD), as a number.',
+    'total: the FINAL amount paid, as a number in the currency printed on the receipt.',
     '- Look for "ВКУПНО", "ВКУПНО ЗА ПЛАЌАЊЕ", "ЗА НАПЛАТА", "ИЗНОС", "TOTAL".',
     '- Do NOT use subtotals, VAT/ДДВ lines, tax bases, cash given ("ПЛАТЕНО", "ГОТОВИНА") or change ("КУСУР", "ВРАТЕНО").',
-    '- Receipts use a comma or a dot for decimals (e.g. "1.250,00" means 1250). Return a plain number like 1250.',
+    '- Receipts use a comma or a dot for decimals (e.g. "1.250,00" means 1250, "12,50" means 12.5). Return a plain number like 1250 or 12.5.',
+    '',
+    'currency: the ISO 4217 code of the total.',
+    '- "ден", "ДЕН", "MKD", "denari", or no currency shown on a Macedonian receipt → "MKD".',
+    '- "€" or "EUR" → "EUR". "$" or "USD" → "USD". "£" or "GBP" → "GBP". "CHF" → "CHF". Otherwise the code printed on the receipt.',
     '',
     'date: the purchase or issue date as YYYY-MM-DD, or null if you cannot read it.',
     '- Dates are written day first, e.g. 05.11.2026 means 2026-11-05.',
@@ -157,12 +161,13 @@ function buildSchema(categoryNames) {
     type: 'object',
     properties: {
       total: { type: 'number' },
+      currency: { type: 'string' },
       date: { type: ['string', 'null'] },
       merchant: { type: ['string', 'null'] },
       summary: { type: ['string', 'null'] },
       category: { type: 'string', enum: categoryNames },
     },
-    required: ['total', 'date', 'merchant', 'summary', 'category'],
+    required: ['total', 'currency', 'date', 'merchant', 'summary', 'category'],
   };
 }
 
@@ -199,8 +204,41 @@ async function askModel(imageBase64, categoryNames) {
   }
 }
 
-function toEntry(raw, categories) {
-  const amount = Math.round(Number(raw.total));
+// ---------------------------------------------------------------------------
+// Currency
+
+// The denar is pegged to the euro. Other currencies go through the ECB's daily
+// euro rates (frankfurter.dev, no key needed), cached for half a day.
+const MKD_PER_EUR = 61.5;
+const RATES_URL = 'https://api.frankfurter.dev/v1/latest?base=EUR';
+const RATES_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+let rateCache = { fetchedAt: 0, rates: null };
+
+async function eurRates() {
+  if (rateCache.rates && Date.now() - rateCache.fetchedAt < RATES_MAX_AGE_MS) return rateCache.rates;
+  try {
+    const data = await fetch(RATES_URL, { signal: AbortSignal.timeout(5000) }).then((r) => r.json());
+    if (data?.rates) rateCache = { fetchedAt: Date.now(), rates: data.rates };
+  } catch (err) {
+    log(`exchange rates unavailable: ${err?.message ?? err}`);
+  }
+  return rateCache.rates; // May be stale, or null if never fetched.
+}
+
+async function mkdPer(currency) {
+  if (currency === 'MKD') return 1;
+  if (currency === 'EUR') return MKD_PER_EUR;
+  const perEur = (await eurRates())?.[currency];
+  return perEur ? MKD_PER_EUR / perEur : null;
+}
+
+async function toEntry(raw, categories) {
+  const total = Number(raw.total);
+  const code = String(raw.currency ?? '').trim().toUpperCase();
+  const currency = /^[A-Z]{3}$/.test(code) ? code : 'MKD';
+  const rate = await mkdPer(currency);
+  if (rate === null) throw new HttpError(502, `Could not convert ${currency} to denars right now. Enter it by hand.`);
+  const amount = Math.round(total * rate);
   const date = typeof raw.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.date) ? raw.date : null;
   const merchant = typeof raw.merchant === 'string' && raw.merchant.trim() ? raw.merchant.trim().slice(0, 200) : null;
   const summary = typeof raw.summary === 'string' && raw.summary.trim() ? raw.summary.trim().slice(0, 150) : null;
@@ -212,6 +250,7 @@ function toEntry(raw, categories) {
     merchant,
     summary,
     categoryId: category?.id ?? null,
+    original: currency !== 'MKD' && Number.isFinite(total) ? { amount: total, currency, rate: Math.round(rate * 100) / 100 } : null,
   };
 }
 
@@ -234,10 +273,10 @@ async function handleScan(req, res) {
   if (categories.length === 0) throw new HttpError(400, 'No categories were sent.');
 
   const raw = await enqueue(() => askModel(image, categories.map((c) => c.name)));
-  const entry = toEntry(raw, categories);
+  const entry = await toEntry(raw, categories);
 
   const categoryName = categories.find((c) => c.id === entry.categoryId)?.name ?? '-';
-  log(`scan ok ${email} ${Date.now() - started}ms amount=${entry.amount} date=${entry.date} merchant=${entry.merchant} category=${categoryName}`);
+  log(`scan ok ${email} ${Date.now() - started}ms amount=${entry.amount}${entry.original ? ` (${entry.original.amount} ${entry.original.currency})` : ''} date=${entry.date} merchant=${entry.merchant} category=${categoryName}`);
   sendJson(res, 200, entry);
 }
 

@@ -15,6 +15,7 @@ export interface ScannedReceipt {
   merchant: string | null;
   summary: string | null;
   categoryId: string | null;
+  original: { amount: number; currency: string; rate: number } | null; // Set when converted from a foreign currency.
 }
 
 async function authHeader(): Promise<string> {
