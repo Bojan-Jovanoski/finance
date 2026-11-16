@@ -60,7 +60,8 @@ export function QuickAddForm({ month }: QuickAddFormProps) {
       }
       setAmount(String(result.amount));
       if (result.categoryId) setCategoryId(result.categoryId);
-      if (result.merchant) setDescription(result.merchant);
+      const memo = [result.merchant, result.summary].filter(Boolean).join(': ');
+      if (memo) setDescription(memo.slice(0, 200));
 
       const notes = ['Filled from receipt — check and record.'];
       if (result.date && result.date >= dateBounds.min && result.date <= dateBounds.max) {

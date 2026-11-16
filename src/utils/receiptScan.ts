@@ -13,6 +13,7 @@ export interface ScannedReceipt {
   amount: number | null;
   date: string | null; // "YYYY-MM-DD"
   merchant: string | null;
+  summary: string | null;
   categoryId: string | null;
 }
 

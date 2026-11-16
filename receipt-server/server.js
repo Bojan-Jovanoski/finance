@@ -134,6 +134,10 @@ function buildPrompt(categoryNames) {
     '',
     'merchant: the short name of the shop or company (e.g. "Vero", "EVN"), or null.',
     '',
+    'summary: what was bought, in English, as a short comma-separated list of at most 5 items (e.g. "milk, bread, chicken, detergent").',
+    '- Use plain general names, not brands or codes. Group similar items. For a bill, name the service (e.g. "electricity for October").',
+    '- Null if you cannot read the items.',
+    '',
     'category: exactly one of the allowed categories below, chosen from what was bought and who issued it.',
     `Allowed categories: ${categoryNames.map((n) => `"${n}"`).join(', ')}.`,
     'Hints (only if such a category exists in the list):',
@@ -155,9 +159,10 @@ function buildSchema(categoryNames) {
       total: { type: 'number' },
       date: { type: ['string', 'null'] },
       merchant: { type: ['string', 'null'] },
+      summary: { type: ['string', 'null'] },
       category: { type: 'string', enum: categoryNames },
     },
-    required: ['total', 'date', 'merchant', 'category'],
+    required: ['total', 'date', 'merchant', 'summary', 'category'],
   };
 }
 
@@ -198,12 +203,14 @@ function toEntry(raw, categories) {
   const amount = Math.round(Number(raw.total));
   const date = typeof raw.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.date) ? raw.date : null;
   const merchant = typeof raw.merchant === 'string' && raw.merchant.trim() ? raw.merchant.trim().slice(0, 200) : null;
+  const summary = typeof raw.summary === 'string' && raw.summary.trim() ? raw.summary.trim().slice(0, 150) : null;
   const wanted = String(raw.category ?? '').trim().toLowerCase();
   const category = categories.find((c) => c.name.trim().toLowerCase() === wanted);
   return {
     amount: Number.isFinite(amount) && amount > 0 ? amount : null,
     date,
     merchant,
+    summary,
     categoryId: category?.id ?? null,
   };
 }
