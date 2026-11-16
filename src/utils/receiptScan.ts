@@ -38,6 +38,20 @@ async function toJpegBase64(file: File): Promise<string> {
   return canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
 }
 
+// "offline": the home PC (or its tunnel) can't be reached.
+// "not-ready": the server is up but Ollama or the model isn't.
+export type ReceiptServerStatus = 'checking' | 'ready' | 'not-ready' | 'offline';
+
+export async function checkReceiptServer(): Promise<ReceiptServerStatus> {
+  try {
+    const response = await fetch(`${API_URL}/health`, { signal: AbortSignal.timeout(6000) });
+    if (response.ok) return 'ready';
+    return response.status === 503 ? 'not-ready' : 'offline';
+  } catch {
+    return 'offline';
+  }
+}
+
 // Asks the server to load the model while the user is still picking a photo.
 export function warmReceiptModel(): void {
   if (!receiptScanEnabled) return;
